@@ -2,7 +2,7 @@
 
 git clone .....
 
-cd votey-front
+cd votey-back
 
 npm install
 
