@@ -52,12 +52,14 @@ module.exports = function(libs) {
 
     console.log('///////////////////////////////test starts////////////////////////////////////')
     
-    var canIDoServices = new CanIDoServices({ questionId: questionId, clientMongoId: clientMongoId})
+    var services = new CanIDoServices({ questionId: questionId, clientMongoId: clientMongoId})
 
-    canIDoServices.loadData().then(function(a){
-      //console.log('question loaded :', canIDoServices.question, 'client loaded: ' , canIDoServices.client)
-      console.log('previousPromotion() :', canIDoServices.previousPromotion() )
-      //console.log('question loaded :', canIDoServices.question, 'client loaded: ' , canIDoServices.client)
+    services.loadData().then(function(){
+      console.log('question loaded :', services.question, 'client loaded: ' , services.client)
+      console.log('previousPromotion() :', services.previousPromotion() )   // 'up'
+      console.log('alreadyPromotedUp() :', services.alreadyPromotedUp() )   // true
+      console.log("canIDo('promoteUp') :", services.canIDo('promoteUp') )   // false
+
       console.log('///////////////////////////////test ends////////////////////////////////////')
     }, function (err) {
       console.log('error',err)

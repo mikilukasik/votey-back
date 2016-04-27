@@ -48,6 +48,12 @@ var router = express.Router()
 
 var seneca = require('seneca')();
 
+var CanIDoServices = require('./modules/canIDoServices.js')({
+	_: _,
+	dbFuncs: dbFuncs,
+	rules: rules
+})
+
 var libs = {
 	dbFuncs: dbFuncs,
 	_: _,

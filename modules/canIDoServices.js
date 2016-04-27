@@ -2,10 +2,15 @@ var exporter = function(libs) {
   
   var _ = libs._;
   var dbFuncs = libs.dbFuncs;
+  var rules = libs.rules;
 
   var CanIDoServices = function(params) { //class
 
     var services = this;
+
+    services.canIDo = function(userAction){
+      return rules.userActions[userAction].canIDo(services); 
+    };
 
     services.clientMongoId = new dbFuncs.ObjectID( params.clientMongoId );
     services.questionId = new dbFuncs.ObjectID( params.questionId );
@@ -40,7 +45,7 @@ var exporter = function(libs) {
     };
 
     services.loadData = function(){
-      return services.loadQuestion().then(function(){ return services.loadClient() })
+      return Promise.all([ services.loadQuestion(), services.loadClient() ]);
     }
 
     services.previousVote = function() {
@@ -53,7 +58,7 @@ var exporter = function(libs) {
       }
     };
     services.previousPromotion = function() {
-      var previousPromotion = _.find(services.client.promotions,function(promotion){ console.log(promotion);return promotion.questionId == services.questionId });
+      var previousPromotion = _.find(services.client.promotions,function(promotion){ return promotion.questionId == services.questionId });
       if (previousPromotion){
         switch (previousPromotion.promoting) {
           case true: return 'up';
@@ -63,61 +68,61 @@ var exporter = function(libs) {
     };
 
     
-    this.alreadyVotedYes = function() {
-      return services.previousVote === 'yes';
+    services.alreadyVotedYes = function() {
+      return services.previousVote() === 'yes';
     };
-    this.alreadyVotedNo = function() {
-      return services.previousVote === 'no';
+    services.alreadyVotedNo = function() {
+      return services.previousVote() === 'no';
     };
     
-    this.alreadyPromotedUp = function() {
-      return services.previousPromotion === 'up';
+    services.alreadyPromotedUp = function() {
+      return services.previousPromotion() === 'up';
     };
-    this.alreadyPromotedDown = function() {
-      return services.previousPromotion === 'down';
+    services.alreadyPromotedDown = function() {
+      return services.previousPromotion() === 'down';
     };
 
 
-    this.hasEnoughUserLevelToVoteYes = function() {
+    services.hasEnoughUserLevelToVoteYes = function() {
 
     };
-    this.hasEnoughUserLevelToVoteNo = function() {
+    services.hasEnoughUserLevelToVoteNo = function() {
 
     };
-    this.hasEnoughUserLevelToPromoteUp = function() {
+    services.hasEnoughUserLevelToPromoteUp = function() {
 
     };
-    this.hasEnoughUserLevelToPromoteDown = function() {
+    services.hasEnoughUserLevelToPromoteDown = function() {
 
     };
-    this.hasEnoughUserLevelToPostQuestion = function() {
+    services.hasEnoughUserLevelToPostQuestion = function() {
 
     };
-    this.hasEnoughUserLevelToRemoveQuestion = function() {
+    services.hasEnoughUserLevelToRemoveQuestion = function() {
 
     };
-    this.hasEnoughUserLevelToForceEscalateQuestion = function() {
+    services.hasEnoughUserLevelToForceEscalateQuestion = function() {
 
     };
-    this.hasEnoughCreditToVoteYes = function() {
+    services.hasEnoughCreditToVoteYes = function() {
 
     };
-    this.hasEnoughCreditToVoteNo = function() {
+    services.hasEnoughCreditToVoteNo = function() {
 
     };
-    this.hasEnoughCreditToPromoteUp = function() {
+    services.hasEnoughCreditToPromoteUp = function() {
 
     };
-    this.hasEnoughCreditToPromoteDown = function() {
+    services.hasEnoughCreditToPromoteDown = function() {
 
     };
-    this.hasEnoughCreditToPostQuestion = function() {
+    services.hasEnoughCreditToPostQuestion = function() {
 
     };
-    this.hasEnoughCreditToRemoveQuestion = function() {
+    services.hasEnoughCreditToRemoveQuestion = function() {
 
     };
-    this.hasEnoughCreditToForceEscalateQuestion = function() {
+    services.hasEnoughCreditToForceEscalateQuestion = function() {
 
     }
   }
