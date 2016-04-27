@@ -53,11 +53,16 @@ module.exports = function(libs) {
     console.log('///////////////////////////////test starts////////////////////////////////////')
     
     var canIDoServices = new CanIDoServices({ questionId: questionId, clientMongoId: clientMongoId})
-    
-    canIDoServices.loadData().then(function(){
-      console.log('question loaded :', canIDoServices.question, 'client loaded: ' , canIDoServices.client)
+
+    canIDoServices.loadData().then(function(a){
+      //console.log('question loaded :', canIDoServices.question, 'client loaded: ' , canIDoServices.client)
+      console.log('previousPromotion() :', canIDoServices.previousPromotion() )
+      //console.log('question loaded :', canIDoServices.question, 'client loaded: ' , canIDoServices.client)
+      console.log('///////////////////////////////test ends////////////////////////////////////')
+    }, function (err) {
+      console.log('error',err)
     })
-    console.log('///////////////////////////////test ends////////////////////////////////////')
+    
 
 
 

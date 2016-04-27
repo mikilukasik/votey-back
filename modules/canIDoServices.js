@@ -17,7 +17,7 @@ var exporter = function(libs) {
     services.client = params.client;        //normally undefined
     services.question = params.question;
 
-    this.loadQuestion = function() {    //normally call first              
+    services.loadQuestion = function() {    //normally call first              
       return new Promise(function(resolve, reject) {
         dbFuncs.findOne('questions', {
           _id: services.questionId
@@ -28,7 +28,7 @@ var exporter = function(libs) {
         });
       });
     };
-    this.loadClient = function() {
+    services.loadClient = function() {
       return new Promise(function(resolve, reject) {
         dbFuncs.findOne('clients', {
           _id: services.clientMongoId
@@ -43,8 +43,8 @@ var exporter = function(libs) {
       return services.loadQuestion().then(function(){ return services.loadClient() })
     }
 
-    this.previousVote = function() {
-      var previousVote = _.find(clientDoc.votes,function(vote){ return vote.questionId === this.questionId });
+    services.previousVote = function() {
+      var previousVote = _.find(services.client.votes,function(vote){ return vote.questionId == services.questionId });
       if (previousVote){
         switch (previousVote.voting) {
           case true: return 'yes';
@@ -52,8 +52,8 @@ var exporter = function(libs) {
         };
       }
     };
-    this.previousPromotion = function() {
-      var previousPromotion = _.find(clientDoc.promotions,function(promotion){ return promotion.questionId === this.questionId });
+    services.previousPromotion = function() {
+      var previousPromotion = _.find(services.client.promotions,function(promotion){ console.log(promotion);return promotion.questionId == services.questionId });
       if (previousPromotion){
         switch (previousPromotion.promoting) {
           case true: return 'up';
