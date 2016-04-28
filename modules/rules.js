@@ -50,7 +50,15 @@ var rules = {
 
       canIDo: function(services) {
 
-        return !services.alreadyVotedYes()// && services.hasEnoughCredit.toVote.yes() && services.hasEnoughUserLevel.toVote.yes()
+        return !services.alreadyVotedYes();// && services.hasEnoughCredit.toVote.yes() && services.hasEnoughUserLevel.toVote.yes()
+
+      },
+
+      whatToDo: function(services) {
+
+        registerYesVote();
+        adjustUserCredit();
+        respondToUser();
 
       }
 
@@ -77,6 +85,14 @@ var rules = {
 
         return !services.alreadyVotedNo()// && services.hasEnoughCredit.toVote.no() && services.hasEnoughUserLevel.toVote.no()
 
+      },
+
+      whatToDo: function(services) {
+
+        registerNoVote();
+        adjustUserCredit();
+        respondToUser();
+
       }
 
     },
@@ -101,6 +117,14 @@ var rules = {
       canIDo: function(services) {
 
         return !services.alreadyPromotedUp()// && services.hasEnoughCredit.toPromote.up() && services.hasEnoughUserLevel.toPromote.up()
+
+      },
+
+      whatToDo: function(services) {
+
+        registerUpPromotion();
+        adjustUserCredit();
+        respondToUser();
 
       }
 
@@ -127,6 +151,14 @@ var rules = {
 
         return !services.alreadyPromotedDown()// && services.hasEnoughCredit.toPromote.down() && services.hasEnoughUserLevel.toPromote.down()
 
+      },
+
+      whatToDo: function(services) {
+
+        registerDownPromotion();
+        adjustUserCredit();
+        respondToUser();
+
       }
 
     },
@@ -151,6 +183,13 @@ var rules = {
       canIDo: function(services) {
 
         return services.hasEnoughCredit.toPostNewQuestion() && services.hasEnoughUserLevel.toPostNewQuestion()
+
+      },
+
+      whatToDo: function(services) {
+
+        registerNewQuestion();
+        respondToUser();
 
       }
 
@@ -177,6 +216,13 @@ var rules = {
 
         return services.hasEnoughCredit.toRemoveQuestion() && services.hasEnoughUserLevel.toRemoveQuestion()
 
+      },
+
+      whatToDo: function(services) {
+
+        removeQuestion();
+        respondToUser();
+
       }
 
     },
@@ -201,6 +247,13 @@ var rules = {
       canIDo: function(services) {
 
         return services.hasEnoughCredit.toForceEscalateQuestion() && services.hasEnoughUserLevel.toForceEscalateQuestion()
+
+      },
+
+      whatToDo: function(services) {
+
+        escalateQuestion();
+        respondToUser();
 
       }
 

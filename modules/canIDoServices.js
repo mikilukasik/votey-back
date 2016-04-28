@@ -8,26 +8,25 @@ var exporter = function(libs) {
 
     var services = this;
 
-    services.canIDo = function(userAction){
-      return rules.userActions[userAction].canIDo(services); 
-    };
-
-    services.clientMongoId = new dbFuncs.ObjectID( params.clientMongoId );
-    services.questionId = new dbFuncs.ObjectID( params.questionId );
-
-    console.log(services.clientMongoId)
-    console.log(services.questionId)
-
+    services.clientMongoId = params.clientMongoId;
+    services.questionId = params.questionId;
 
     services.client = params.client;        //normally undefined
     services.question = params.question;
 
+    services.canIDo = function(userAction){
+      return rules.userActions[userAction].canIDo(services); 
+    };
+
+    services.doIt = function(userAction){
+      rules.userActions[userAction].whatToDo(services); 
+    };
+
     services.loadQuestion = function() {    //normally call first              
       return new Promise(function(resolve, reject) {
         dbFuncs.findOne('questions', {
-          _id: services.questionId
+          _id: new dbFuncs.ObjectID( services.questionId )
         }, function(questionDoc) {
-          console.log(questionDoc)
           services.question = questionDoc;
           resolve(questionDoc);
         });
@@ -36,7 +35,7 @@ var exporter = function(libs) {
     services.loadClient = function() {
       return new Promise(function(resolve, reject) {
         dbFuncs.findOne('clients', {
-          _id: services.clientMongoId
+          _id: new dbFuncs.ObjectID( services.clientMongoId )
         }, function(clientDoc) {
           services.client = clientDoc;
           resolve(clientDoc);
@@ -46,10 +45,37 @@ var exporter = function(libs) {
 
     services.loadData = function(){
       return Promise.all([ services.loadQuestion(), services.loadClient() ]);
-    }
+    };
+
+    services.saveQuestion = function() {
+      return new Promise(function(resolve, reject) {
+        dbFuncs.save('questions', services.question, function(savedQuestionDoc) {
+          resolve(savedQuestionDoc);
+        });
+      });
+    };
+    
+    services.saveClient = function() {
+      return new Promise(function(resolve, reject) {
+        dbFuncs.save('clients', services.client, function(savedClientDoc) {
+          resolve(savedClientDoc);
+        });
+      });
+    };
+
+    services.saveData = function() {
+      return Promise.all([ services.saveQuestion(), services.saveClient() ])
+    };
+
+    services.doAndSave = function(userAction) {
+      services.doIt(userAction);
+      return services.saveData();
+    };
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     services.previousVote = function() {
-      var previousVote = _.find(services.client.votes,function(vote){ return vote.questionId == services.questionId });
+      var previousVote = _.find(services.client.votes,function(vote){ return vote.questionId === services.questionId });
       if (previousVote){
         switch (previousVote.voting) {
           case true: return 'yes';
@@ -57,8 +83,9 @@ var exporter = function(libs) {
         };
       }
     };
+
     services.previousPromotion = function() {
-      var previousPromotion = _.find(services.client.promotions,function(promotion){ return promotion.questionId == services.questionId });
+      var previousPromotion = _.find(services.client.promotions,function(promotion){ return promotion.questionId === services.questionId });
       if (previousPromotion){
         switch (previousPromotion.promoting) {
           case true: return 'up';
