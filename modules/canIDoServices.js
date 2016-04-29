@@ -18,15 +18,6 @@ var exporter = function(libs) {
 
     services.whatToSave = [];
 
-    // services.createLoadedServices = function(params) {
-      
-    //   var child = new services(params);
-
-    //   return child.loadData().then(function(){
-    //     return child;
-    //   });
-    // };
-
     services.canIDo = function(optionalUserAction){
 
       var userAction = (optionalUserAction) ? optionalUserAction : services.desiredAction;
@@ -178,6 +169,15 @@ var exporter = function(libs) {
 
     }
   }
+
+  CanIDoServices.loadNew = function(params) {
+      
+    var newService = new CanIDoServices(params);
+
+    return newService.loadData().then(function(child){
+      return child;
+    });
+  };
 
   return CanIDoServices;
 
