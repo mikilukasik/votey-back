@@ -18,8 +18,10 @@ var exporter = function(libs) {
 
     services.whatToSave = [];
 
-    services.loadNewService = function(params) {
+    services.createLoadedServices = function(params) {
+      
       var child = new services(params);
+
       return child.loadData().then(function(){
         return child;
       });
