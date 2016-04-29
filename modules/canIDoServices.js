@@ -6,6 +6,8 @@ var exporter = function(libs) {
 
   var CanIDoServices = function(params) { //class
 
+    var services = this;
+
     services.createLoadedServices = function(tempParams) {
       
       var child = new CanIDoServices(tempParams);
@@ -14,10 +16,10 @@ var exporter = function(libs) {
         return child;
       });
     };
-    
+
     if(!params) return;
 
-    var services = this;
+    
 
     services.clientMongoId = params.clientMongoId;
     services.questionId = params.questionId;
