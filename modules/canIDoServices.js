@@ -6,6 +6,17 @@ var exporter = function(libs) {
 
   var CanIDoServices = function(params) { //class
 
+    services.createLoadedServices = function(tempParams) {
+      
+      var child = new CanIDoServices(tempParams);
+
+      return child.loadData().then(function(){
+        return child;
+      });
+    };
+    
+    if(!params) return;
+
     var services = this;
 
     services.clientMongoId = params.clientMongoId;
@@ -18,14 +29,7 @@ var exporter = function(libs) {
 
     services.whatToSave = [];
 
-    services.createLoadedServices = function(tempParams) {
-      
-      var child = new CanIDoServices(tempParams);
-
-      return child.loadData().then(function(){
-        return child;
-      });
-    };
+    
 
     services.canIDo = function(optionalUserAction){
 
