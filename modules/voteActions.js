@@ -52,15 +52,11 @@ module.exports = function(libs) {
 
     console.log('///////////////////////////////test starts////////////////////////////////////')
     
-    var services = new CanIDoServices({ questionId: questionId, clientMongoId: clientMongoId})
+    CanIDoServices.loadNewService({ questionId: questionId, clientMongoId: clientMongoId, desiredAction: (promoting) ? 'promoteUp' : 'promoteDown' }).then(function(services){
 
-    services.loadData().then(function(){
-      console.log('question loaded :', services.question, 'client loaded: ' , services.client)
-      console.log('previousPromotion() :', services.previousPromotion() )   // 'up'
-      console.log('alreadyPromotedUp() :', services.alreadyPromotedUp() )   // true
-      console.log("canIDo('promoteUp') :", services.canIDo('promoteUp') )   // false
+      console.log("services.canIDo('promoteUp') = ", services.canIDo('promoteUp'))
 
-      console.log('///////////////////////////////test ends////////////////////////////////////')
+
     }, function (err) {
       console.log('error',err)
     })

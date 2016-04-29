@@ -14,11 +14,28 @@ var exporter = function(libs) {
     services.client = params.client;        //normally undefined
     services.question = params.question;
 
-    services.canIDo = function(userAction){
+    services.desiredAction = params.desiredAction;
+
+    services.whatToSave = [];
+
+    services.loadNewService = function(params) {
+      var child = new services(params);
+      return child.loadData().then(function(){
+        return child;
+      });
+    };
+
+    services.canIDo = function(optionalUserAction){
+
+      var userAction = (optionalUserAction) ? optionalUserAction : services.desiredAction;
+
       return rules.userActions[userAction].canIDo(services); 
     };
 
-    services.doIt = function(userAction){
+    services.doIt = function(optionalUserAction){
+
+      var userAction = (optionalUserAction) ? optionalUserAction : services.desiredAction;
+
       rules.userActions[userAction].whatToDo(services); 
     };
 
@@ -67,9 +84,13 @@ var exporter = function(libs) {
       return Promise.all([ services.saveQuestion(), services.saveClient() ])
     };
 
-    services.doAndSave = function(userAction) {
+    services.doAndSave = function(optionalUserAction) {
+
+      var userAction = (optionalUserAction) ? optionalUserAction : services.desiredAction;
+
       services.doIt(userAction);
       return services.saveData();
+
     };
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
