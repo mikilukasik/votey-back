@@ -52,7 +52,7 @@ module.exports = function(libs) {
 
     console.log('///////////////////////////////test starts////////////////////////////////////')
     
-    CanIDoServices().createLoadedServices({ questionId: questionId, clientMongoId: clientMongoId, desiredAction: (promoting) ? 'promoteUp' : 'promoteDown' })
+    new CanIDoServices({ questionId: questionId, clientMongoId: clientMongoId, desiredAction: (promoting) ? 'promoteUp' : 'promoteDown' }).loadData()
     .then(function(services){
 
       console.log("services.canIDo('promoteUp') = ", services.canIDo('promoteUp'))
