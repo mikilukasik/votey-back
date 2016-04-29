@@ -18,9 +18,9 @@ var exporter = function(libs) {
 
     services.whatToSave = [];
 
-    services.createLoadedServices = function(params) {
+    services.createLoadedServices = function(tempParams) {
       
-      var child = new CanIDoServices(params);
+      var child = new CanIDoServices(tempParams);
 
       return child.loadData().then(function(){
         return child;
