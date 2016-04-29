@@ -20,7 +20,7 @@ var exporter = function(libs) {
 
     services.createLoadedServices = function(params) {
       
-      var child = new services(params);
+      var child = new CanIDoServices(params);
 
       return child.loadData().then(function(){
         return child;
@@ -63,7 +63,9 @@ var exporter = function(libs) {
     };
 
     services.loadData = function(){
-      return Promise.all([ services.loadQuestion(), services.loadClient() ]);
+      return Promise.all([ services.loadQuestion(), services.loadClient() ]).then(function(){
+        return services;
+      });
     };
 
     services.saveQuestion = function() {
