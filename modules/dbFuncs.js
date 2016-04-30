@@ -102,6 +102,21 @@ var exportThis = {
       })
     }
   },
+  save: function(collectionName, doc, savedCb) {
+    //mongodb.connect(cn, function(err, dbGlobals.db) {
+    if (dbGlobals.db) {
+      dbGlobals.db.collection(collectionName).save(doc, function(err, doc2) {
+          if (savedCb) savedCb(doc, err, doc2)
+        })
+        //dbGlobals.db.close()
+    } else {
+      dbGlobals.pendingStuff.push({
+        started: new Date(),
+        funcToCall: 'insert',
+        arguments: [collectionName, doc, savedCb]
+      })
+    }
+  },
   findOne: function(collectionName, query, cb) {
     //mongodb.connect(cn, function(err, dbGlobals.db) {
     if (dbGlobals.db) {

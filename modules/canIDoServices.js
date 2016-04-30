@@ -7,6 +7,7 @@ var exporter = function(libs) {
   var CanIDoServices = function(params) { //class
 
     var services = this;
+    services.not = {};
 
     services.clientMongoId = params.clientMongoId;
     services.questionId = params.questionId;
@@ -17,6 +18,27 @@ var exporter = function(libs) {
     services.desiredAction = params.desiredAction;
 
     services.whatToSave = [];
+
+    services.messages = {
+      cantDo : [],
+      success: [],
+    };
+
+    services.getCantDoMessagesStr = function (joinerStr) {
+      var resultStr = services.messages.cantDo.join(joinerStr ? joinerStr : ',');
+      services.messages.cantDo = [];
+      return resultStr;
+    };
+
+    services.getSuccessMessagesStr = function (joinerStr) {
+      var resultStr = services.messages.success.join(joinerStr ? joinerStr : ',');
+      services.messages.success = [];
+      return resultStr;
+    };
+
+    services.addToSave = function (toSaveStr){
+      if(services.whatToSave.indexOf(toSaveStr) < 0) services.whatToSave.push(toSaveStr);
+    };
 
     services.canIDo = function(optionalUserAction){
 
@@ -38,6 +60,7 @@ var exporter = function(libs) {
           _id: new dbFuncs.ObjectID( services.questionId )
         }, function(questionDoc) {
           services.question = questionDoc;
+          console.log('q loaded',questionDoc)
           resolve(questionDoc);
         });
       });
@@ -54,7 +77,13 @@ var exporter = function(libs) {
     };
 
     services.loadData = function(){
-      return Promise.all([ services.loadQuestion(), services.loadClient() ]).then(function(){
+
+      var loadingPromises = [];
+
+      if('clientMongoId' in params) loadingPromises.push(services.loadClient());
+      if('questionId' in params) loadingPromises.push(services.loadQuestion())
+
+      return Promise.all( loadingPromises ).then(function(){
         return services;
       });
     };
@@ -62,6 +91,8 @@ var exporter = function(libs) {
     services.saveQuestion = function() {
       return new Promise(function(resolve, reject) {
         dbFuncs.save('questions', services.question, function(savedQuestionDoc) {
+
+          services.whatToSave.splice(services.whatToSave.indexOf('question'),1);
           resolve(savedQuestionDoc);
         });
       });
@@ -70,16 +101,24 @@ var exporter = function(libs) {
     services.saveClient = function() {
       return new Promise(function(resolve, reject) {
         dbFuncs.save('clients', services.client, function(savedClientDoc) {
+
+          services.whatToSave.splice(services.whatToSave.indexOf('client'),1);
           resolve(savedClientDoc);
         });
       });
     };
 
     services.saveData = function() {
-      return Promise.all([ services.saveQuestion(), services.saveClient() ])
+
+      var savingPromises = [];
+
+      if(services.whatToSave.indexOf('client') >= 0) savingPromises.push(services.saveClient())
+      if(services.whatToSave.indexOf('question') >= 0) savingPromises.push(services.saveQuestion())
+
+      return Promise.all(savingPromises);
     };
 
-    services.doAndSave = function(optionalUserAction) {
+    services.doAndSaveData = function(optionalUserAction) {
 
       var userAction = (optionalUserAction) ? optionalUserAction : services.desiredAction;
 
@@ -90,93 +129,237 @@ var exporter = function(libs) {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    services.previousVote = function() {
-      var previousVote = _.find(services.client.votes,function(vote){ return vote.questionId === services.questionId });
-      if (previousVote){
-        switch (previousVote.voting) {
+    services.getRegisteredVoteObject = function(createIfDoesntExist){
+      
+
+      if(!services.storedRegisteredVoteObject) services.storedRegisteredVoteObject =  _.find(services.client.votes,function(vote){ return vote.questionId === services.questionId });
+      
+      if(!services.storedRegisteredVoteObject && createIfDoesntExist){
+        services.storedRegisteredVoteObject = {
+          questionId : services.questionId,
+          voting : null
+        };
+        services.client.votes.push(services.storedRegisteredVoteObject);
+        services.addToSave('client');
+      };
+
+      return services.storedRegisteredVoteObject;
+    };
+
+    services.getRegisteredPromotionObject = function(createIfDoesntExist){
+      if(!services.storedRegisteredPromotionObject) services.storedRegisteredPromotionObject =  _.find(services.client.promotions,function(promotion){ return promotion.questionId === services.questionId });
+      if(!services.storedRegisteredPromotionObject && createIfDoesntExist){
+        services.storedRegisteredPromotionObject = {
+          questionId : services.questionId,
+          promoting : null
+        };
+        services.client.promotions.push(services.storedRegisteredPromotionObject);
+        services.addToSave('client');
+      };
+      return services.storedRegisteredPromotionObject;
+    };
+
+
+    services.registeredVote = function() {
+      var registeredVoteObj = services.getRegisteredVoteObject();
+    
+      if (registeredVoteObj){
+        switch (registeredVoteObj.voting) {
           case true: return 'yes';
           case false: return 'no';
         };
       }
     };
 
-    services.previousPromotion = function() {
-      var previousPromotion = _.find(services.client.promotions,function(promotion){ return promotion.questionId === services.questionId });
-      if (previousPromotion){
-        switch (previousPromotion.promoting) {
+    services.registeredPromotion = function() {
+
+      var registeredPromotion = services.getRegisteredPromotionObject();
+
+      if (registeredPromotion){
+        switch (registeredPromotion.promoting) {
           case true: return 'up';
           case false: return 'down';
         };
       }
     };
 
+    services.questionIsVotable = function() {
+      if(services.question.votable) return true;
+      services.messages.cantDo.push('Question is not Votable.')
+    };
+
+    services.not.questionIsVotable = function() {
+
+      if(!services.questionIsVotable()) return true;
+
+      services.messages.cantDo.push('Question is votable.')
+    };
     
     services.alreadyVotedYes = function() {
-      return services.previousVote() === 'yes';
+      if(services.registeredVote() === 'yes') return true;
+      services.messages.cantDo.push('Did not vote YES yet.')
     };
+    services.not.alreadyVotedYes = function() {
+
+      if(!services.alreadyVotedYes()) return true;
+
+      services.messages.cantDo.push('Already voted YES.')
+    };
+
     services.alreadyVotedNo = function() {
-      return services.previousVote() === 'no';
+      if(services.registeredVote() === 'no') return true;
+      services.messages.cantDo.push('Did not vote NO yet.')
+    };
+    services.not.alreadyVotedNo = function() {
+      if(!services.alreadyVotedNo()) return true;
+      services.messages.cantDo.push('Already voted NO.')
     };
     
     services.alreadyPromotedUp = function() {
-      return services.previousPromotion() === 'up';
+      if(services.registeredPromotion() === 'up') return true;
+      services.messages.cantDo.push('Did not promote UP yet.')
     };
+    services.not.alreadyPromotedUp = function() {
+      if(!services.alreadyPromotedUp()) return true;
+      services.messages.cantDo.push('Already promoted UP.')
+    };
+
     services.alreadyPromotedDown = function() {
-      return services.previousPromotion() === 'down';
+      if(services.registeredPromotion() === 'down') return true;
+      services.messages.cantDo.push('Did not promote DOWN yet.')
+    };
+    services.not.alreadyPromotedDown = function() {
+      if(!services.alreadyPromotedDown()) return true;
+      services.messages.cantDo.push('Already promoted DOWN.')
     };
 
 
-    services.hasEnoughUserLevelToVoteYes = function() {
+    services.hasEnoughUserLevel = function() {
 
     };
-    services.hasEnoughUserLevelToVoteNo = function() {
+   
+    services.hasEnoughCredit = function() {
 
     };
-    services.hasEnoughUserLevelToPromoteUp = function() {
+    
+    //////////////////////////////  doIt  /////////////////////////////
+
+    services.escalateQuestion = function() {
+      console.log(']]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]',services.question)
+      services.question.votable = true;
+      console.log(']]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]')
+
+      services.addToSave('question');
+      services.messages.success.push('Question escalated.');
 
     };
-    services.hasEnoughUserLevelToPromoteDown = function() {
+
+    services.registerUpPromotion = function(){
+
+      var firstPromotion = !services.registeredPromotion();
+      var changeOfPromotion = services.alreadyPromotedDown();
+
+      services.getRegisteredPromotionObject('createIfDoesntExist').promoting = true;
+
+
+      if (firstPromotion) {
+        services.question.promoteUp ++;
+        services.addToSave('question');
+        services.addToSave('client');
+        services.messages.success.push('Positive promotion registered.');
+      }
+      if (changeOfPromotion) {
+        services.question.promoteUp ++;
+        services.question.promoteDown --;
+        services.addToSave('question');
+        services.addToSave('client');
+        services.messages.success.push('Promotion changed to positive.')
+      }
 
     };
-    services.hasEnoughUserLevelToPostQuestion = function() {
+
+    services.registerDownPromotion = function(){
+      
+      var firstPromotion = !services.registeredPromotion();
+      var changeOfPromotion = services.alreadyPromotedUp();
+
+      services.getRegisteredPromotionObject('createIfDoesntExist').promoting = false;
+
+
+      if (firstPromotion) {
+        services.question.promoteDown ++;
+        services.addToSave('question');
+        services.addToSave('client');
+        services.messages.success.push('Negative promotion registered.');
+      }
+      if (changeOfPromotion) {
+        services.question.promoteUp --;
+        services.question.promoteDown ++;
+        services.addToSave('question');
+        services.addToSave('client');
+        services.messages.success.push('Promotion changed to negative.')
+      }
 
     };
-    services.hasEnoughUserLevelToRemoveQuestion = function() {
+
+    services.registerYesVote = function(){
+
+      var firstVote = !services.registeredVote();
+      var changeOfVote = services.alreadyVotedNo();
+
+      services.getRegisteredVoteObject('createIfDoesntExist').voting = true;
+
+
+      if (firstVote) {
+        services.question.voteUp ++;    //TODO:  change all voteUp to voteYes
+        services.addToSave('question');
+        services.addToSave('client');
+        services.messages.success.push('Positive vote registered.');
+      }
+      if (changeOfVote) {
+        services.question.voteUp ++;
+        services.question.voteDown --;
+        services.addToSave('question');
+        services.addToSave('client');
+        services.messages.success.push('Vote changed to positive.')
+      }
 
     };
-    services.hasEnoughUserLevelToForceEscalateQuestion = function() {
+
+    services.registerNoVote = function(){
+      
+      var firstVote = !services.registeredVote();
+      var changeOfVote = services.alreadyVotedYes();
+
+      services.getRegisteredVoteObject('createIfDoesntExist').voting = false;
+
+
+      if (firstVote) {
+        services.question.voteDown ++;
+        services.addToSave('question');
+        services.addToSave('client');
+        services.messages.success.push('Negative vote registered.');
+      }
+      if (changeOfVote) {
+        services.question.voteUp --;
+        services.question.voteDown ++;
+        services.addToSave('question');
+        services.addToSave('client');
+        services.messages.success.push('Vote changed to negative.')
+      }
 
     };
-    services.hasEnoughCreditToVoteYes = function() {
+
+    services.adjustUserCredit = function(){
 
     };
-    services.hasEnoughCreditToVoteNo = function() {
 
-    };
-    services.hasEnoughCreditToPromoteUp = function() {
-
-    };
-    services.hasEnoughCreditToPromoteDown = function() {
-
-    };
-    services.hasEnoughCreditToPostQuestion = function() {
-
-    };
-    services.hasEnoughCreditToRemoveQuestion = function() {
-
-    };
-    services.hasEnoughCreditToForceEscalateQuestion = function() {
-
-    }
-  }
+  };
 
   CanIDoServices.loadNew = function(params) {
-      
-    var newService = new CanIDoServices(params);
+    
+    return new CanIDoServices(params).loadData();
 
-    return newService.loadData().then(function(child){
-      return child;
-    });
   };
 
   return CanIDoServices;

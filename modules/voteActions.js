@@ -27,153 +27,153 @@ module.exports = function(libs) {
   function escalate(args, done) {
     var req = args.req;
 
-    dbFuncs.update('questions', {
-      _id: new dbFuncs.ObjectID(req.params.questionID)
-    }, function(question) {
-      question.votable = true;
+    var questionId = req.body.questionId;   //req.params doesn't work???
+    
+    CanIDoServices.loadNew({ questionId: questionId, desiredAction: 'forceEscalateQuestion' })
+    .then(function(services){
+
+      if ( services.canIDo() ) {
+        
+        services.doAndSaveData().then(function(){
+          //success
+          var successStr = services.getSuccessMessagesStr();
+          console.log('Question escalated.');
+          done(null, {
+            toast: {
+              type: 'success',
+              text: successStr
+            },
+            success: true
+          });
+
+
+        },function(saveErr){
+          //error in logic?
+
+          console.log('ERROR: some error in logic(?), forceEscalateQuestion canIdo true, but error in doAndSaveData: ', saveErr);
+          done(null, {
+            toast: {
+              type: 'error',
+              text: 'ERROR: some error in logic(?), forceEscalateQuestion canIdo true, but error in doAndSaveData: ' + saveErr
+            },
+            error: true
+          });
+        });
+      } else {
+        //could not do action
+
+        var cantDoReason = services.getCantDoMessagesStr();
+        console.log('Could not do forceEscalateQuestion, reason(s): ', cantDoReason);
+        done(null, {
+          toast: {
+            type: 'error',
+            text: cantDoReason
+          },
+          error: true
+        });
+        
+
+      }
+
+    }, function (err) {
+      //could not load services
+
+      console.log('ERROR: Could not load services: ',err);
       done(null, {
         toast: {
-          type: 'success',
-          text: 'Question escalated.'
+          type: 'error',
+          text: 'ERROR: Could not load services: ' + err
         },
-        result: 'Question escalated.',
-        success: true
-      })
+        error: true
+      });
+
     })
+
+
+    // dbFuncs.update('questions', {
+    //   _id: new dbFuncs.ObjectID(req.params.questionID)
+    // }, function(question) {
+    //   question.votable = true;
+    //   done(null, {
+    //     toast: {
+    //       type: 'success',
+    //       text: 'Question escalated.'
+    //     },
+    //     result: 'Question escalated.',
+    //     success: true
+    //   })
+    // })
 
   }
 
   function promote(args, done) {
+
     var req = args.req;
 
     var questionId = req.body.questionId;
     var clientMongoId = req.body.clientMongoId;
     var promoting = req.body.promoting;
 
-    console.log('///////////////////////////////test starts////////////////////////////////////')
-    
     CanIDoServices.loadNew({ questionId: questionId, clientMongoId: clientMongoId, desiredAction: (promoting) ? 'promoteUp' : 'promoteDown' })
     .then(function(services){
 
-      console.log("services.desiredAction = ", services.desiredAction)
-      console.log("services.canIDo() = ", services.canIDo())
+      if ( services.canIDo() ) {
+        
+        services.doAndSaveData().then(function(){
+          //success
+          var successStr = services.getSuccessMessagesStr();
+          console.log('Promotion registered and saved.');
+          done(null, {
+            toast: {
+              type: 'success',
+              text: successStr
+            },
+            success: true
+          });
 
 
-    }, function (err) {
-      console.log('error',err)
-    })
-    
+        },function(saveErr){
+          //error in logic?
 
+          console.log('ERROR: some error in logic(?), promote canIdo true, but error in doAndSaveData: ', saveErr);
+          done(null, {
+            toast: {
+              type: 'error',
+              text: 'ERROR: some error in logic(?), promote canIdo true, but error in doAndSaveData: ' + saveErr
+            },
+            error: true
+          });
+        });
+      } else {
+        //could not do action
 
-
-    dbFuncs.update('clients', {
-      _id: new dbFuncs.ObjectID(clientMongoId)
-    }, function(client) {
-
-      if(!client){
+        var cantDoReason = services.getCantDoMessagesStr();
+        console.log('Could not do promotion, reason(s): ', cantDoReason);
         done(null, {
           toast: {
             type: 'error',
-            text: 'Client not in DB.'
+            text: cantDoReason
           },
-          result: 'Client not in DB.'
-        })
-        return;
+          error: true
+        });
+        
+
       }
 
-      var existingPromotion = (_.find(client.promotions, function(promotion) {
-        return (promotion.questionId === questionId)
-      }))
-      if (existingPromotion) {
-        console.log('user already promoted, promotion:', existingPromotion)
-        if (existingPromotion.promoting) {
-          //user already promoted up
-          if (promoting) {
-            done(null, {
-              toast: {
-                type: 'error',
-                text: 'You already promoted up this question.'
-              },
-              result: 'User already promoted up this question.'
-            })
-          } else {
-            //change promotion down//
-            existingPromotion.promoting = false;
-            dbFuncs.update('questions', {
-              _id: dbFuncs.ObjectID(questionId)
-            }, function(question) {
-              question.promoteUp--
-                question.promoteDown++
-                done(null, {
-                  toast: {
-                    type: 'success',
-                    text: 'Promotion changed to negative.'
-                  },
-                  result: 'Promotion changed to negative.'
-                })
-            })
-          }
-        } else {
-          //user already promoted down
-          if (promoting) {
-            //change vote
-            existingPromotion.promoting = true;
-            dbFuncs.update('questions', {
-              _id: dbFuncs.ObjectID(questionId)
-            }, function(question) {
-              question.promoteUp++
-                question.promoteDown--
-                done(null, {
-                  toast: {
-                    type: 'success',
-                    text: 'Promotion changed to positive.'
-                  },
-                  result: 'Promotion changed to positive.'
-                })
-            })
-          } else {
-            done(null, {
-              toast: {
-                type: 'error',
-                text: 'You already promoted down this question.'
-              },
-              result: 'User already promoted down this question.'
-            })
-          }
-        }
-      } else {
-        console.log('first promotion')
-        client.promotions.push({
-          questionId: questionId,
-          promoting: promoting
-        })
-        dbFuncs.update('questions', {
-          _id: new dbFuncs.ObjectID(questionId)
-        }, function(question) {
-          if (promoting) {
-            question.promoteUp++
-              done(null, {
+    }, function (err) {
+      //could not load services
+
+      console.log('ERROR: Could not load services: ',err);
+      done(null, {
         toast: {
-          type: 'success',
-          text: 'Positive promotion registered.'
+          type: 'error',
+          text: 'ERROR: Could not load services: ' + err
         },
-        result: 'Positive promotion registered.',
-        success: true
-      })
-          } else {
-            question.promoteDown++
-              done(null, {
-        toast: {
-          type: 'success',
-          text: 'Negative promotion registered.'
-        },
-        result: 'Negative promotion registered.',
-        success: true
-      })
-          }
-        })
-      }
+        error: true
+      });
+
     })
+
   };
 
   function vote(args, done) {
@@ -183,115 +183,183 @@ module.exports = function(libs) {
     var questionId = req.body.questionId;
     var clientMongoId = req.body.clientMongoId;
     var voting = req.body.voting;
-    dbFuncs.update('clients', {
-      _id: new dbFuncs.ObjectID(clientMongoId)
-    }, function(client) {
 
-      if(!client){
+
+
+    CanIDoServices.loadNew({ questionId: questionId, clientMongoId: clientMongoId, desiredAction: (voting) ? 'voteYes' : 'voteNo' })
+    .then(function(services){
+
+      if ( services.canIDo() ) {
+        console.log('fut')
+        services.doAndSaveData().then(function(){
+          //success
+          var successStr = services.getSuccessMessagesStr();
+          console.log('Vote registered and saved.');
+          done(null, {
+            toast: {
+              type: 'success',
+              text: successStr
+            },
+            success: true
+          });
+
+
+        },function(saveErr){
+          //error in logic?
+
+          console.log('ERROR: some error in logic(?), vote canIdo true, but error in doAndSaveData: ', saveErr);
+          done(null, {
+            toast: {
+              type: 'error',
+              text: 'ERROR: some error in logic(?), vote canIdo true, but error in doAndSaveData: ' + saveErr
+            },
+            error: true
+          });
+        });
+      } else {
+        //could not do action
+
+        var cantDoReason = services.getCantDoMessagesStr();
+        console.log('Could not do vote, reason(s): ', cantDoReason);
         done(null, {
           toast: {
             type: 'error',
-            text: 'Client not in DB.'
+            text: cantDoReason
           },
-          result: 'Client not in DB.'
-        })
-        return;
+          error: true
+        });
+        
+
       }
 
-      var existingVote = (_.find(client.votes, function(vote) {
-        return (vote.questionId === questionId)
-      }))
-      if (existingVote) {
-        console.log('user already voted, vote:', existingVote)
-        if (existingVote.voting) {
-          //user already voted up
-          if (voting) {
-            done(null, {
+    }, function (err) {
+      //could not load services
 
-              toast: {
-                type: 'error',
-                text: 'You already voted YES to this question.'
-              },
-              result: 'User already voted up this question.'
-            })
-          } else {
-            //change promotion down//
-            existingVote.voting = false;
-            dbFuncs.update('questions', {
-              _id: dbFuncs.ObjectID(questionId)
-            }, function(question) {
-              question.voteUp--
-                question.voteDown++
-                done(null, {
-                  toast: {
-                    type: 'success',
-                    text: 'Vote changed to NO.'
-                  },
-                  result: 'Vote changed to negative.'
-                })
-            })
-          }
-        } else {
-          //user already voted down
-          if (voting) {
-            //change vote
-            existingVote.voting = true;
-            dbFuncs.update('questions', {
-              _id: dbFuncs.ObjectID(questionId)
-            }, function(question) {
-              question.voteUp++
-                question.voteDown--
-                done(null, {
-                  toast: {
-                    type: 'success',
-                    text: 'Vote changed to YES.'
-                  },
-                  result: 'Vote changed to positive.'
-                })
-            })
-          } else {
-            done(null, {
-              toast: {
-                type: 'error',
-                text: 'You already voted NO to this question.'
-              },
-              result: 'User already voted down this question.'
-            })
-          }
-        }
-      } else {
-        console.log('first vote')
-        client.votes.push({
-          questionId: questionId,
-          voting: voting
-        })
-        dbFuncs.update('questions', {
-          _id: new dbFuncs.ObjectID(questionId)
-        }, function(question) {
-          if (voting) {
-            question.voteUp++
-              done(null, {
+      console.log('ERROR: Could not load services: ',err);
+      done(null, {
         toast: {
-          type: 'success',
-          text: "'YES' vote registered."
+          type: 'error',
+          text: 'ERROR: Could not load services: ' + err
         },
-        result: "'YES' vote registered.",
-        success: true
-      })
-          } else {
-            question.voteDown++
-              done(null, {
-        toast: {
-          type: 'success',
-          text: "'NO' vote registered."
-        },
-        result: "'NO' vote registered.",
-        success: true
-      })
-          }
-        })
-      }
+        error: true
+      });
+
     })
+
+
+
+
+
+
+    // dbFuncs.update('clients', {
+    //   _id: new dbFuncs.ObjectID(clientMongoId)
+    // }, function(client) {
+
+    //   if(!client){
+    //     done(null, {
+    //       toast: {
+    //         type: 'error',
+    //         text: 'Client not in DB.'
+    //       },
+    //       result: 'Client not in DB.'
+    //     })
+    //     return;
+    //   }
+
+    //   var existingVote = (_.find(client.votes, function(vote) {
+    //     return (vote.questionId === questionId)
+    //   }))
+    //   if (existingVote) {
+    //     console.log('user already voted, vote:', existingVote)
+    //     if (existingVote.voting) {
+    //       //user already voted up
+    //       if (voting) {
+    //         done(null, {
+
+    //           toast: {
+    //             type: 'error',
+    //             text: 'You already voted YES to this question.'
+    //           },
+    //           result: 'User already voted up this question.'
+    //         })
+    //       } else {
+    //         //change promotion down//
+    //         existingVote.voting = false;
+    //         dbFuncs.update('questions', {
+    //           _id: dbFuncs.ObjectID(questionId)
+    //         }, function(question) {
+    //           question.voteUp--
+    //             question.voteDown++
+    //             done(null, {
+    //               toast: {
+    //                 type: 'success',
+    //                 text: 'Vote changed to NO.'
+    //               },
+    //               result: 'Vote changed to negative.'
+    //             })
+    //         })
+    //       }
+    //     } else {
+    //       //user already voted down
+    //       if (voting) {
+    //         //change vote
+    //         existingVote.voting = true;
+    //         dbFuncs.update('questions', {
+    //           _id: dbFuncs.ObjectID(questionId)
+    //         }, function(question) {
+    //           question.voteUp++
+    //             question.voteDown--
+    //             done(null, {
+    //               toast: {
+    //                 type: 'success',
+    //                 text: 'Vote changed to YES.'
+    //               },
+    //               result: 'Vote changed to positive.'
+    //             })
+    //         })
+    //       } else {
+    //         done(null, {
+    //           toast: {
+    //             type: 'error',
+    //             text: 'You already voted NO to this question.'
+    //           },
+    //           result: 'User already voted down this question.'
+    //         })
+    //       }
+    //     }
+    //   } else {
+    //     console.log('first vote')
+    //     client.votes.push({
+    //       questionId: questionId,
+    //       voting: voting
+    //     })
+    //     dbFuncs.update('questions', {
+    //       _id: new dbFuncs.ObjectID(questionId)
+    //     }, function(question) {
+    //       if (voting) {
+    //         question.voteUp++
+    //           done(null, {
+    //     toast: {
+    //       type: 'success',
+    //       text: "'YES' vote registered."
+    //     },
+    //     result: "'YES' vote registered.",
+    //     success: true
+    //   })
+    //       } else {
+    //         question.voteDown++
+    //           done(null, {
+    //     toast: {
+    //       type: 'success',
+    //       text: "'NO' vote registered."
+    //     },
+    //     result: "'NO' vote registered.",
+    //     success: true
+    //   })
+    //       }
+    //     })
+    //   }
+    // })
   };
 
 }
