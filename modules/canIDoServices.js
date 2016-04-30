@@ -1,7 +1,7 @@
 var exporter = function(libs) {
   
   var _ = libs._;
-  var dbFuncs = libs.dbFuncs;
+  var db = libs.db;
   var rules = libs.rules;
 
   var CanIDoServices = function(params) { //class
@@ -56,22 +56,26 @@ var exporter = function(libs) {
 
     services.loadQuestion = function() {    //normally call first              
       return new Promise(function(resolve, reject) {
-        dbFuncs.findOne('questions', {
-          _id: new dbFuncs.ObjectID( services.questionId )
-        }, function(questionDoc) {
+        db.findOne('questions', {
+          _id: new db.ObjectID( services.questionId )
+        }).then(function(questionDoc) {
           services.question = questionDoc;
           console.log('q loaded',questionDoc)
-          resolve(questionDoc);
+          return resolve(questionDoc);
+        },function(err){
+          return reject(err)
         });
       });
     };
     services.loadClient = function() {
       return new Promise(function(resolve, reject) {
-        dbFuncs.findOne('clients', {
-          _id: new dbFuncs.ObjectID( services.clientMongoId )
-        }, function(clientDoc) {
+        db.findOne('clients', {
+          _id: new db.ObjectID( services.clientMongoId )
+        }).then(function(clientDoc) {
           services.client = clientDoc;
-          resolve(clientDoc);
+          return resolve(clientDoc);
+        },function(err){
+          return reject(err);
         });
       });
     };
@@ -90,20 +94,24 @@ var exporter = function(libs) {
 
     services.saveQuestion = function() {
       return new Promise(function(resolve, reject) {
-        dbFuncs.save('questions', services.question, function(savedQuestionDoc) {
+        db.save('questions', services.question).then(function(savedQuestionDoc) {
 
           services.whatToSave.splice(services.whatToSave.indexOf('question'),1);
-          resolve(savedQuestionDoc);
+          return resolve(savedQuestionDoc);
+        },function(err){
+          reject(err)
         });
       });
     };
     
     services.saveClient = function() {
       return new Promise(function(resolve, reject) {
-        dbFuncs.save('clients', services.client, function(savedClientDoc) {
+        db.save('clients', services.client).then(function(savedClientDoc) {
 
           services.whatToSave.splice(services.whatToSave.indexOf('client'),1);
-          resolve(savedClientDoc);
+          return resolve(savedClientDoc);
+        },function(err){
+          reject(err)
         });
       });
     };

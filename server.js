@@ -3,30 +3,25 @@ var morgan = require('morgan');
 var bodyParser = require("body-parser");
 var fs = require('fs');
 
-var _ = require('underscore')
+var _ = require('lodash')
 
 var http = require('http');
 var cors = require('cors');
 
 var bcrypt = require('bcrypt');
 
-
-var mongocn = process.env.MONGO_URL || "mongodb://localhost:27017/votidb";
-//var mongocn = process.env.DOKKU_MONGO_VOTIDB_PORT_27017_TCP.replace('tcp://','mongodb://miki:miki@') + '/' + "votidb"
-
-console.log('mongo connection string: ',mongocn)
-
-var dbFuncs = require('./modules/dbFuncs.js')
-
-var CanIDoServices = require('./modules/canIDoServices.js')({
-	_: _,
-	dbFuncs: dbFuncs
-})
-
 var rules = require('./modules/rules.js')
 
 
-dbFuncs.connect(mongocn)
+var mongocn = process.env.MONGO_URL || "mongodb://localhost:27017/votidb";
+var db = require('./modules/mongoHandler.js')(mongocn)
+
+var CanIDoServices = require('./modules/canIDoServices.js')({
+	_: _,
+	db: db
+})
+
+
 
 
 var app = express()
@@ -50,12 +45,12 @@ var seneca = require('seneca')();
 
 var CanIDoServices = require('./modules/canIDoServices.js')({
 	_: _,
-	dbFuncs: dbFuncs,
+	db: db,
 	rules: rules
 })
 
 var libs = {
-	dbFuncs: dbFuncs,
+	db: db,
 	_: _,
 	bcrypt: bcrypt,
 	CanIDoServices: CanIDoServices,

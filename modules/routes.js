@@ -82,7 +82,7 @@ var initRouter = function(router, app) {
       var question = req.body.question;
       var header = req.body.header;
 
-      dbFuncs.insert('questions', {
+      db.save('questions', {
         header: header,
         question: question,
         promoteUp: 0,
@@ -90,27 +90,36 @@ var initRouter = function(router, app) {
         voteUp: 0,
         voteDown: 0,
         votable: false
-      }, function() {
+      }).then(function(savedDoc) {
         res.json({
-            inserted: question
-          }) //
+          inserted: savedDoc
+        }) //
+      },function(err){
+        console.log('route ERROR, POST api/questions: ',err)
+        res.status(500).json({ error: 'route ERROR, POST api/questions', details: err });
       })
     });
 
   router.route('/questions/votables')
     .get(function(req, res) {
-      dbFuncs.query('questions', {
+      db.query('questions', {
         votable: true
-      }, function(questions, saver) {
-        res.json(questions)
+      }).then(function(questions) {
+        res.json(questions);
+      },function(err){
+        console.log('route ERROR, GET api/questions/votables: ',err);
+        res.status(500).json({ error: 'route ERROR, GET api/questions/votables', details: err });
       })
     });
   router.route('/questions/promotables')
     .get(function(req, res) {
-      dbFuncs.query('questions', {
+      db.query('questions', {
         votable: false
-      }, function(questions, saver) {
+      }).then(function(questions) {
         res.json(questions)
+      },function(err){
+        console.log('route ERROR, GET api/questions/promotables: ',err);
+        res.status(500).json({ error: 'route ERROR, GET api/questions/promotables', details: err });
       })
     });
 
@@ -118,10 +127,13 @@ var initRouter = function(router, app) {
 
   router.route('/questions/:questionID')
     .get(function(req, res) {
-      dbFuncs.findOne('questions', {
-        _id: new dbFuncs.ObjectID(req.params.questionID)
-      }, function(question) {
+      db.findOne('questions', {
+        _id: new db.ObjectID(req.params.questionID)
+      }).then(function(question) {
         res.json(question)
+      },function(err){
+        console.log('route ERROR, GET api/questions/' + req.params.questionID + ': ',err);
+        res.status(500).json({ error: 'route ERROR, GET api/questions/' + req.params.questionID, details: err });
       })
     });
 
@@ -144,14 +156,15 @@ var initRouter = function(router, app) {
         hardWareId = 'some browser ' + Math.random();
       };
 
-      dbFuncs.findOne('clients', {
+      db.findOne('clients', {
         hardWareId: hardWareId,
         username: false
-      }, function(myRecord) {
+      }).then(function(myRecord) {
+        console.log('recoooooooooo:',myRecord)
         if (!myRecord) {
 
           //new client
-          dbFuncs.insert('clients', {
+          db.save('clients', {
 
             username: false,
             hardWareId: hardWareId,
@@ -162,10 +175,13 @@ var initRouter = function(router, app) {
 
             },
 
-          }, function(myNewRecord) {
+          }).then(function(myNewRecord) {
             res.json({
               clientMongoId: myNewRecord._id
             })
+          }, function(err){
+            console.log('route ERROR when saving to db, GET /client-mongo-id/:hardWareId',err);
+            res.status(500).json({ error: 'route ERROR, GET /client-mongo-id/' + hardWareId, details: err });
           })
         } else {
           console.log('known client', myRecord)
@@ -174,21 +190,27 @@ var initRouter = function(router, app) {
             clientMongoId: myRecord._id
           })
         }
+      },function(err){
+        console.log('route ERROR when reading from db, GET /client-mongo-id/:hardWareId',err);
+        res.status(500).json({ error: 'route ERROR, GET /client-mongo-id/' + hardWareId, details: err });
       })
     });
 
   router.route('/client-mongo-id/:clientMongoId')
 
     .put(function(req, res) {
- console.log('vmit kerdez')
-      var clientMongoId = req.params.clientMongoId;
-
-      dbFuncs.findOne('clients', {
-        _id: new dbFuncs.ObjectID(clientMongoId)
-      }, function(myRecord) {
+ 
+      var clientMongoId = req.body.clientMongoId;
+      console.log('clientMongoId in question: ',clientMongoId)
+      db.findOne('clients', {
+        _id: new db.ObjectID(clientMongoId)
+      }).then(function(myRecord) {
         if (!myRecord) {
           //send res error
-          res.status(500)
+
+
+          //TODO: change error code below
+          res.status(500)    
             .send('Unknown clientMongoId, please send hardWareId');
 
         } else {
@@ -198,6 +220,9 @@ var initRouter = function(router, app) {
             clientMongoId: myRecord._id
           })
         }
+      },function(err){
+        console.log('route ERROR when reading from db, PUT /client-mongo-id/:clientMongoId',err);
+        res.status(500).json({ error: 'route ERROR, PUT /client-mongo-id/' + clientMongoId, details: err });
       })
     });
 
@@ -205,13 +230,13 @@ var initRouter = function(router, app) {
     .post(function(req, res) {
       //TODO: replace this function with real one////
 
-      var objId = new dbFuncs.ObjectID(req.params.clientMongoId);
+      var objId = new db.ObjectID(req.params.clientMongoId);
 
-      dbFuncs.update('clients', {
+      db.findOne('clients', {
         _id: objId
-      }, function(myRecord) {
+      }, function(myRecord) {     //update in cb and save after
         if (!myRecord) {
-          dbFuncs.insert('clients', {
+          db.save('clients', {
             _id: objId,
 
             username: false,
@@ -221,9 +246,9 @@ var initRouter = function(router, app) {
             recovered: new Date(),
             preferences: {
 
-            },
+            }
 
-          }, function(myNewRecord) {
+          }).then(function(myNewRecord) {
             res.json({
               clientMongoId: myNewRecord._id
             })

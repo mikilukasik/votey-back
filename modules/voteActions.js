@@ -1,6 +1,6 @@
 module.exports = function(libs) {
 
-  var dbFuncs = libs.dbFuncs;
+  var db = libs.db;
   var _ = libs._;
   var rules = libs.rules;
   var CanIDoServices = libs.CanIDoServices;
@@ -90,8 +90,8 @@ module.exports = function(libs) {
     })
 
 
-    // dbFuncs.update('questions', {
-    //   _id: new dbFuncs.ObjectID(req.params.questionID)
+    // db.update('questions', {
+    //   _id: new db.ObjectID(req.params.questionID)
     // }, function(question) {
     //   question.votable = true;
     //   done(null, {
@@ -251,8 +251,8 @@ module.exports = function(libs) {
 
 
 
-    // dbFuncs.update('clients', {
-    //   _id: new dbFuncs.ObjectID(clientMongoId)
+    // db.update('clients', {
+    //   _id: new db.ObjectID(clientMongoId)
     // }, function(client) {
 
     //   if(!client){
@@ -285,8 +285,8 @@ module.exports = function(libs) {
     //       } else {
     //         //change promotion down//
     //         existingVote.voting = false;
-    //         dbFuncs.update('questions', {
-    //           _id: dbFuncs.ObjectID(questionId)
+    //         db.update('questions', {
+    //           _id: db.ObjectID(questionId)
     //         }, function(question) {
     //           question.voteUp--
     //             question.voteDown++
@@ -304,8 +304,8 @@ module.exports = function(libs) {
     //       if (voting) {
     //         //change vote
     //         existingVote.voting = true;
-    //         dbFuncs.update('questions', {
-    //           _id: dbFuncs.ObjectID(questionId)
+    //         db.update('questions', {
+    //           _id: db.ObjectID(questionId)
     //         }, function(question) {
     //           question.voteUp++
     //             question.voteDown--
@@ -333,8 +333,8 @@ module.exports = function(libs) {
     //       questionId: questionId,
     //       voting: voting
     //     })
-    //     dbFuncs.update('questions', {
-    //       _id: new dbFuncs.ObjectID(questionId)
+    //     db.update('questions', {
+    //       _id: new db.ObjectID(questionId)
     //     }, function(question) {
     //       if (voting) {
     //         question.voteUp++

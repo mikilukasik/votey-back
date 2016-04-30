@@ -212,15 +212,14 @@ var rules = {
 
       canIDo: function(services) {
 
-        return services.hasEnoughCredit.toRemoveQuestion() && services.hasEnoughUserLevel.toRemoveQuestion()
+        return services.hasEnoughCredit() && services.hasEnoughUserLevel()
 
       },
 
       whatToDo: function(services) {
 
         services.removeQuestion();
-        
-
+  
       }
 
     },
