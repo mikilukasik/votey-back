@@ -79,26 +79,39 @@ var initRouter = function(router, app) {
 
   router.route('/questions')
     .post(function(req, res) {
-      var question = req.body.question;
-      var header = req.body.header;
-
-      db.save('questions', {
-        header: header,
-        question: question,
-        promoteUp: 0,
-        promoteDown: 0,
-        voteUp: 0,
-        voteDown: 0,
-        votable: false
-      }).then(function(savedDoc) {
-        res.json({
-          inserted: savedDoc
-        }) //
-      },function(err){
-        console.log('route ERROR, POST api/questions: ',err)
-        res.status(500).json({ error: 'route ERROR, POST api/questions', details: err });
-      })
+      seneca.act({
+        role: 'vote',
+        cmd: 'postNewQuestion',
+        req: req
+      }, function(err, resJson) {
+        res.json(resJson);
+      });
     });
+
+
+
+  // router.route('/questions')
+  //   .post(function(req, res) {
+  //     var question = req.body.question;
+  //     var header = req.body.header;
+
+  //     db.save('questions', {
+  //       header: header,
+  //       question: question,
+  //       promoteUp: 0,
+  //       promoteDown: 0,
+  //       voteUp: 0,
+  //       voteDown: 0,
+  //       votable: false
+  //     }).then(function(savedDoc) {
+  //       res.json({
+  //         inserted: savedDoc
+  //       }) //
+  //     },function(err){
+  //       console.log('route ERROR, POST api/questions: ',err)
+  //       res.status(500).json({ error: 'route ERROR, POST api/questions', details: err });
+  //     })
+  //   });
 
   router.route('/questions/votables')
     .get(function(req, res) {

@@ -24,6 +24,11 @@ module.exports = function(libs) {
     cmd: 'escalate'
   }, escalate);
 
+  seneca.add({
+    role: 'vote',
+    cmd: 'postNewQuestion'
+  }, postNewQuestion);
+
   function escalate(args, done) {
     var req = args.req;
 
@@ -149,6 +154,76 @@ module.exports = function(libs) {
 
         var cantDoReason = services.getCantDoMessagesStr();
         console.log('Could not do promotion, reason(s): ', cantDoReason);
+        done(null, {
+          toast: {
+            type: 'error',
+            text: cantDoReason
+          },
+          error: true
+        });
+        
+
+      }
+
+    }, function (err) {
+      //could not load services
+
+      console.log('ERROR: Could not load services: ',err);
+      done(null, {
+        toast: {
+          type: 'error',
+          text: 'ERROR: Could not load services: ' + err
+        },
+        error: true
+      });
+
+    })
+
+  };
+
+
+  function postNewQuestion(args, done) {
+
+    var req = args.req;
+
+    var newQuestion = req.body.newQuestion
+
+    var services = new CanIDoServices({ newQuestion: newQuestion, desiredAction: 'postNewQuestion' });
+    services.loadQuestionList({ header: newQuestion.header })
+    .then(function(){
+
+      if ( services.canIDo() ) {
+        
+        services.doAndSaveData().then(function(){
+          //success
+          var successStr = services.getSuccessMessagesStr();
+          
+          done(null, {
+            toast: {
+              type: 'success',
+              text: successStr
+            },
+            success: true
+          });
+
+
+        },function(saveErr){
+          //error in logic?
+
+          console.log('ERROR: some error in logic(?), postNewQuestion canIdo true, but error in doAndSaveData: ', saveErr);
+          done(null, {
+            toast: {
+              type: 'error',
+              text: 'ERROR: some error in logic(?), postNewQuestion canIdo true, but error in doAndSaveData: ' + saveErr
+            },
+            error: true
+          });
+        });
+      } else {
+        //could not do action
+
+        var cantDoReason = services.getCantDoMessagesStr();
+        console.log('Could not do postNewQuestion, reason(s): ', cantDoReason);
         done(null, {
           toast: {
             type: 'error',

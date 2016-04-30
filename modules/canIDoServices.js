@@ -14,8 +14,11 @@ var exporter = function(libs) {
 
     services.client = params.client;        //normally undefined
     services.question = params.question;
+    services.questionList = params.questionList;
 
     services.desiredAction = params.desiredAction;
+
+    services.newQuestion = params.newQuestion;
 
     services.whatToSave = [];
 
@@ -53,7 +56,17 @@ var exporter = function(libs) {
 
       rules.userActions[userAction].whatToDo(services); 
     };
-
+    services.loadQuestionList = function(query) {    //normally call first              
+      return new Promise(function(resolve, reject) {
+        db.query('questions', query).then(function(questionList) {
+          services.questionList = questionList;
+          console.log('@@@@@@@@@@@@@@@@@@@@',questionList)
+            return resolve(questionList);
+        },function(err){
+          return reject(err)
+        });
+      });
+    };
     services.loadQuestion = function() {    //normally call first              
       return new Promise(function(resolve, reject) {
         db.findOne('questions', {
@@ -99,7 +112,7 @@ var exporter = function(libs) {
           services.whatToSave.splice(services.whatToSave.indexOf('question'),1);
           return resolve(savedQuestionDoc);
         },function(err){
-          reject(err)
+          return reject(err)
         });
       });
     };
@@ -111,7 +124,7 @@ var exporter = function(libs) {
           services.whatToSave.splice(services.whatToSave.indexOf('client'),1);
           return resolve(savedClientDoc);
         },function(err){
-          reject(err)
+          return reject(err)
         });
       });
     };
@@ -241,6 +254,15 @@ var exporter = function(libs) {
       services.messages.cantDo.push('Already promoted DOWN.')
     };
 
+    services.questionHeaderExists = function() {
+      if(_.some(services.questionList,function(question){ return question.header === services.newQuestion.header })) return true;
+      services.messages.cantDo.push("Question header doesn't exist.");
+    };
+    services.not.questionHeaderExists = function() {
+      if(!services.questionHeaderExists()) return true;
+      services.messages.cantDo.push('Question already exists.')
+    };
+
 
     services.hasEnoughUserLevel = function() {
 
@@ -356,6 +378,20 @@ var exporter = function(libs) {
         services.messages.success.push('Vote changed to negative.')
       }
 
+    };
+
+    services.postNewQuestion = function(){
+      services.question = {
+        header: services.newQuestion.header,
+        question: services.newQuestion.body,
+        promoteUp: 0,
+        promoteDown: 0,
+        voteUp: 0,
+        voteDown: 0,
+        votable: false
+      };
+      services.addToSave('question');
+      services.messages.success.push('Question added.')
     };
 
     services.adjustUserCredit = function(){

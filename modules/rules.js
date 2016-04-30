@@ -180,13 +180,13 @@ var rules = {
 
       canIDo: function(services) {
 
-        return services.hasEnoughCredit.toPostNewQuestion() && services.hasEnoughUserLevel.toPostNewQuestion()
+        return services.not.questionHeaderExists() //services.hasEnoughCredit() && services.hasEnoughUserLevel()
 
       },
 
       whatToDo: function(services) {
 
-        services.registerNewQuestion();
+        services.postNewQuestion();
         
 
       }
