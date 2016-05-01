@@ -370,6 +370,18 @@ var rules = {
 
       },
 
+      serviceBuilder: function(req) {
+        return {
+          questionId: req.body.questionId
+        }
+      },
+
+      loaderAsync: function(services) {
+        return [
+          services.loadQuestion()
+        ]
+      },
+
       canIDo: function(services) {
         return services.not.questionIsVotable(); //hasEnoughCredit.toForceEscalateQuestion() && services.hasEnoughUserLevel.toForceEscalateQuestion()
 
@@ -379,7 +391,29 @@ var rules = {
 
         services.escalateQuestion();
 
+      },
+
+      successPostFlightAsync: function(services) {
+        return [
+          services.doAndSaveData()
+        ]
+      },
+
+      successResponseBuilder: function(services) {
+        return {
+          toast: services.getSuccessMessagesStr(),
+          data: undefined
+        };
+      },
+
+      cantDoResponseBuilder: function(services) {
+        return {
+          toast: services.getCantDoMessagesStr(),
+          data: undefined
+        };
       }
+
+      
 
     },
 

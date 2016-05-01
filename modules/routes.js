@@ -76,9 +76,11 @@ var initRouter = function(router, app) {
   router.route('/questions/:questionID') //escalate
     .put(function(req, res) {
       seneca.act({
-        role: 'vote',
-        cmd: 'escalate',
-        req: req
+        role: 'general',
+        cmd: 'dealWithUserAction',
+        req: req,
+        res: res,
+        desiredAction: 'forceEscalateQuestion'
       }, function(err, resJson) {
         if(err) res.status(500).json({ error: 'seneca ERROR in router', details: err, req: req });
         res.json(resJson);

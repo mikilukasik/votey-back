@@ -13,21 +13,6 @@ module.exports = function(libs) {
     cmd: 'dealWithUserAction'
   }, dealWithUserAction);
 
-  seneca.add({
-    role: 'vote',
-    cmd: 'vote'
-  }, vote);
-
-  seneca.add({
-    role: 'vote',
-    cmd: 'promote'
-  }, promote);
-
-  seneca.add({
-    role: 'vote',
-    cmd: 'escalate'
-  }, escalate);
-
   function escalate(args, done) {
     var req = args.req;
 
@@ -152,102 +137,5 @@ module.exports = function(libs) {
 
   };
 
-  function promote(args, done) {
-
-    var req = args.req;
-
-    CanIDoServices.loadNew({
-        req: req,
-        desiredAction: (args.req.body.promoting) ? 'promoteUp' : 'promoteDown'
-      })
-      .then(function(services) {
-
-        if (services.canIDo()) {
-          services.doSuccessPostFlightAsync().then(function() {
-
-            done(null, services.buildSuccessResponse());
-
-          }, function(saveErr) {
-            //error in logic?
-
-            console.log('ERROR: some error in logic(?), promote canIdo true, but error in doAndSaveData: ', saveErr);
-            done(null, {
-              toast: {
-                type: 'error',
-                text: 'ERROR: some error in logic(?), promote canIdo true, but error in doAndSaveData: ' + saveErr
-              },
-              error: true
-            });
-          });
-        } else {
-          //could not do action
-          done(null, services.buildCantDoResponse());
-
-        }
-
-      }, function(err) {
-        //could not load services
-
-        console.log('ERROR: Could not load services: ', err);
-        done(null, {
-          toast: {
-            type: 'error',
-            text: 'ERROR: Could not load services: ' + err
-          },
-          error: true
-        });
-
-      })
-
-  };
-
-  function vote(args, done) {
-
-    var req = args.req;
-
-    CanIDoServices.loadNew({
-        req: req,
-        desiredAction: (req.body.voting) ? 'voteYes' : 'voteNo'
-      })
-      .then(function(services) {
-
-        if (services.canIDo()) {
-          services.doSuccessPostFlightAsync().then(function() {
-
-            done(null, services.buildSuccessResponse());
-
-          }, function(saveErr) {
-            //error in logic?
-
-            console.log('ERROR: some error in logic(?), vote canIdo true, but error in doAndSaveData: ', saveErr);
-            done(null, {
-              toast: {
-                type: 'error',
-                text: 'ERROR: some error in logic(?), vote canIdo true, but error in doAndSaveData: ' + saveErr
-              },
-              error: true
-            });
-          });
-        } else {
-          //could not do action
-          done(null, services.buildCantDoResponse());
-
-        }
-
-      }, function(err) {
-        //could not load services
-
-        console.log('ERROR: Could not load services: ', err);
-        done(null, {
-          toast: {
-            type: 'error',
-            text: 'ERROR: Could not load services: ' + err
-          },
-          error: true
-        });
-
-      })
-
-  };
 
 }
