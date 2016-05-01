@@ -67,6 +67,10 @@ var exporter = function(libs) {
       return services.questionList;
     };
 
+    services.getMyQuestion = function() {   //TODO: add myVotes
+      return services.question;
+    };
+
     services.loadQuestion = function() {      
       return new Promise(function(resolve, reject) {
         db.findOne('questions', {
@@ -217,64 +221,64 @@ var exporter = function(libs) {
       }
     };
 
-    services.questionIsVotable = function() {
+    services.questionIsVotable = function(dontPushMsg) {
       if (services.question.votable) return true;
-      services.messages.cantDo.push('Question is not Votable.')
+      if (!dontPushMsg) services.messages.cantDo.push('Question is not Votable.')
     };
 
     services.not.questionIsVotable = function() {
 
-      if (!services.questionIsVotable()) return true;
+      if (!services.questionIsVotable(1)) return true;
 
       services.messages.cantDo.push('Question is votable.')
     };
 
-    services.alreadyVotedYes = function() {
+    services.alreadyVotedYes = function(dontPushMsg) {
       if (services.registeredVote() === 'yes') return true;
-      services.messages.cantDo.push('Did not vote YES yet.')
+      if (!dontPushMsg) services.messages.cantDo.push('Did not vote YES yet.')
     };
     services.not.alreadyVotedYes = function() {
 
-      if (!services.alreadyVotedYes()) return true;
+      if (!services.alreadyVotedYes(1)) return true;
 
       services.messages.cantDo.push('Already voted YES.')
     };
 
-    services.alreadyVotedNo = function() {
+    services.alreadyVotedNo = function(dontPushMsg) {
       if (services.registeredVote() === 'no') return true;
-      services.messages.cantDo.push('Did not vote NO yet.')
+      if (!dontPushMsg) services.messages.cantDo.push('Did not vote NO yet.')
     };
     services.not.alreadyVotedNo = function() {
-      if (!services.alreadyVotedNo()) return true;
+      if (!services.alreadyVotedNo(1)) return true;
       services.messages.cantDo.push('Already voted NO.')
     };
 
-    services.alreadyPromotedUp = function() {
+    services.alreadyPromotedUp = function(dontPushMsg) {
       if (services.registeredPromotion() === 'up') return true;
-      services.messages.cantDo.push('Did not promote UP yet.')
+      if (!dontPushMsg) services.messages.cantDo.push('Did not promote UP yet.')
     };
     services.not.alreadyPromotedUp = function() {
-      if (!services.alreadyPromotedUp()) return true;
+      if (!services.alreadyPromotedUp(1)) return true;
       services.messages.cantDo.push('Already promoted UP.')
     };
 
-    services.alreadyPromotedDown = function() {
+    services.alreadyPromotedDown = function(dontPushMsg) {
       if (services.registeredPromotion() === 'down') return true;
-      services.messages.cantDo.push('Did not promote DOWN yet.')
+      if (!dontPushMsg) services.messages.cantDo.push('Did not promote DOWN yet.')
     };
     services.not.alreadyPromotedDown = function() {
-      if (!services.alreadyPromotedDown()) return true;
+      if (!services.alreadyPromotedDown(1)) return true;
       services.messages.cantDo.push('Already promoted DOWN.')
     };
 
-    services.questionHeaderExists = function() {
+    services.questionHeaderExists = function(dontPushMsg) {
       if (_.some(services.questionList, function(question) {
           return question.header === services.newQuestion.header
         })) return true;
-      services.messages.cantDo.push("Question header doesn't exist.");
+      if (!dontPushMsg) services.messages.cantDo.push("Question header doesn't exist.");
     };
     services.not.questionHeaderExists = function() {
-      if (!services.questionHeaderExists()) return true;
+      if (!services.questionHeaderExists(1)) return true;
       services.messages.cantDo.push('Question already exists.')
     };
 
@@ -392,7 +396,7 @@ var exporter = function(libs) {
       services.question = {
         header: services.newQuestion.header,
         question: services.newQuestion.body,
-        postedBy: services.newQuestion.postedBy,
+        postedBy: services.clientMongoId,
         promoteUp: 0,
         promoteDown: 0,
         voteUp: 0,
@@ -413,9 +417,7 @@ var exporter = function(libs) {
         success: true
       }
 
-      var toastText = rules.userActions[services.desiredAction].successResponseBuilder(services).toast
-
-
+      var toastText = rules.userActions[services.desiredAction].successResponseBuilder(services).toast;
 
       if (toastText) {
         result.toast = {
@@ -424,7 +426,7 @@ var exporter = function(libs) {
         }
       }
 
-      var data = rules.userActions[services.desiredAction].successResponseBuilder(services).data
+      var data = rules.userActions[services.desiredAction].successResponseBuilder(services).data;
       if (data) {
         result.data = data;
       }
@@ -438,7 +440,7 @@ var exporter = function(libs) {
         error: true
       }
 
-      var toastText = rules.userActions[services.desiredAction].cantDoResponseBuilder(services).toast
+      var toastText = rules.userActions[services.desiredAction].cantDoResponseBuilder(services).toast;
       if (toastText) {
         result.toast = {
           type: 'error',
@@ -446,7 +448,7 @@ var exporter = function(libs) {
         }
       }
 
-      var data = rules.userActions[services.desiredAction].cantDoResponseBuilder(services).data
+      var data = rules.userActions[services.desiredAction].cantDoResponseBuilder(services).data;
       if (data) {
         result.data = data;
       }

@@ -93,9 +93,11 @@ var initRouter = function(router, app) {
   router.route('/questions')
     .post(function(req, res) {
       seneca.act({
-        role: 'question',
-        cmd: 'postNewQuestion',
-        req: req
+        role: 'general',
+        cmd: 'dealWithUserAction',
+        req: req,
+        res: res,
+        desiredAction: 'postNewQuestion'
       }, function(err, resJson) {
         if(err) res.status(500).json({ error: 'seneca ERROR in router', details: err, req: req });
         res.json(resJson);
@@ -105,9 +107,11 @@ var initRouter = function(router, app) {
   router.route('/questions/votables')
     .get(function(req, res) {
       seneca.act({
-        role: 'question',
-        cmd: 'getVotables',
-        req: req
+        role: 'general',
+        cmd: 'dealWithUserAction',
+        req: req,
+        res: res,
+        desiredAction: 'getVotableQuestions'
       }, function(err, resJson) {
         if(err) res.status(500).json({ error: 'seneca ERROR in router', details: err, req: req });
         res.json(resJson);
@@ -117,42 +121,31 @@ var initRouter = function(router, app) {
   router.route('/questions/promotables')
     .get(function(req, res) {
       seneca.act({
-        role: 'question',
-        cmd: 'getPromotables',
-        req: req
+        role: 'general',
+        cmd: 'dealWithUserAction',
+        req: req,
+        res: res,
+        desiredAction: 'getPromotableQuestions'
       }, function(err, resJson) {
         if(err) res.status(500).json({ error: 'seneca ERROR in router', details: err, req: req });
         res.json(resJson);
       });
     });
 
-  
-    
-  // router.route('/questions/promotables')
-  //   .get(function(req, res) {
-  //     db.query('questions', {
-  //       votable: false
-  //     }).then(function(questions) {
-  //       res.json(questions)
-  //     },function(err){
-  //       console.log('route ERROR, GET api/questions/promotables: ',err);
-  //       res.status(500).json({ error: 'route ERROR, GET api/questions/promotables', details: err, req: req });
-  //     })
-  //   });
-
-
-
-  router.route('/questions/:questionID')
+  router.route('/questions/:questionId')
     .get(function(req, res) {
-      db.findOne('questions', {
-        _id: new db.ObjectID(req.params.questionID)
-      }).then(function(question) {
-        res.json(question)
-      },function(err){
-        console.log('route ERROR, GET api/questions/' + req.params.questionID + ': ',err);
-        res.status(500).json({ error: 'route ERROR, GET api/questions/' + req.params.questionID, details: err, req: req });
-      })
+      seneca.act({
+        role: 'general',
+        cmd: 'dealWithUserAction',
+        req: req,
+        res: res,
+        desiredAction: 'getQuestion'
+      }, function(err, resJson) {
+        if(err) res.status(500).json({ error: 'seneca ERROR in router', details: err, req: req });
+        res.json(resJson);
+      });
     });
+
 
 
   router.route('/check')

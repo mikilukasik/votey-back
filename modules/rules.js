@@ -63,7 +63,7 @@ var rules = {
 
       canIDo: function(services) {
 
-        return services.not.alreadyVotedYes() // && services.hasEnoughCredit() && services.hasEnoughUserLevel()
+        return services.not.alreadyVotedYes() && services.questionIsVotable() // && services.hasEnoughCredit() && services.hasEnoughUserLevel()
 
       },
 
@@ -128,7 +128,7 @@ var rules = {
 
       canIDo: function(services) {
 
-        return services.not.alreadyVotedNo() // && services.hasEnoughCredit() && services.hasEnoughUserLevel()
+        return services.not.alreadyVotedNo() && services.questionIsVotable()// && services.hasEnoughCredit() && services.hasEnoughUserLevel()
 
       },
 
@@ -193,7 +193,7 @@ var rules = {
 
       canIDo: function(services) {
 
-        return services.not.alreadyPromotedUp(); // && services.hasEnoughCredit.toPromote.up() && services.hasEnoughUserLevel.toPromote.up()
+        return services.not.alreadyPromotedUp() && services.not.questionIsVotable(); // && services.hasEnoughCredit.toPromote.up() && services.hasEnoughUserLevel.toPromote.up()
 
       },
 
@@ -258,7 +258,7 @@ var rules = {
 
       canIDo: function(services) {
 
-        return services.not.alreadyPromotedDown(); // && services.hasEnoughCredit.toPromote.up() && services.hasEnoughUserLevel.toPromote.up()
+        return services.not.alreadyPromotedDown() && services.not.questionIsVotable(); // && services.hasEnoughCredit.toPromote.up() && services.hasEnoughUserLevel.toPromote.up()
 
       },
 
@@ -308,6 +308,20 @@ var rules = {
 
       },
 
+      serviceBuilder: function(req) {
+        return {
+          newQuestion: req.body.newQuestion
+        };
+      },
+
+      loaderAsync: function(services) {
+        return [
+          services.loadQuestionList({
+            header: services.newQuestion.header
+          })
+        ];
+      },
+
       canIDo: function(services) {
 
         return services.not.questionHeaderExists() //services.hasEnoughCredit() && services.hasEnoughUserLevel()
@@ -318,6 +332,26 @@ var rules = {
 
         services.postNewQuestion();
 
+      },
+
+      successPostFlightAsync: function(services) {
+        return [
+          services.doAndSaveData()
+        ]
+      },
+
+      successResponseBuilder: function(services) {
+        return {
+          toast: services.getSuccessMessagesStr(),
+          data: undefined
+        };
+      },
+
+      cantDoResponseBuilder: function(services) {
+        return {
+          toast: services.getCantDoMessagesStr(),
+          data: undefined
+        };
       }
 
     },
@@ -413,8 +447,6 @@ var rules = {
         };
       }
 
-      
-
     },
 
     getVotableQuestions: {
@@ -434,15 +466,42 @@ var rules = {
 
       },
 
+      serviceBuilder: function(req) {
+        return {};
+      },
+
+      loaderAsync: function(services) {
+        return [
+          services.loadQuestionList({
+            votable: true
+          })
+        ]
+      },
+
       canIDo: function(services) {
         return true;
       },
 
-      whatToDo: function(services) {
+      whatToDo: function(services) {},
 
-        return services.getMyQuestionList();
+      successPostFlightAsync: function(services) {
+        return [];
+      },
 
+      successResponseBuilder: function(services) {
+        return {
+          toast: undefined,
+          data: services.getMyQuestionList()
+        };
+      },
+
+      cantDoResponseBuilder: function(services) {
+        return {
+          toast: services.getCantDoMessagesStr(),
+          data: undefined
+        };
       }
+
 
     },
 
@@ -463,14 +522,95 @@ var rules = {
 
       },
 
+      serviceBuilder: function(req) {
+        return {};
+      },
+
+      loaderAsync: function(services) {
+        return [
+          services.loadQuestionList({
+            votable: false
+          })
+        ]
+      },
+
       canIDo: function(services) {
         return true;
       },
 
-      whatToDo: function(services) {
+      whatToDo: function(services) {},
 
-        return services.getMyQuestionList();
+      successPostFlightAsync: function(services) {
+        return [];
+      },
 
+      successResponseBuilder: function(services) {
+        return {
+          toast: undefined,
+          data: services.getMyQuestionList()
+        };
+      },
+
+      cantDoResponseBuilder: function(services) {
+        return {
+          toast: services.getCantDoMessagesStr(),
+          data: undefined
+        };
+      }
+
+    },
+
+    getQuestion: {
+
+      name: {
+        type: 'userActions',
+        action: 'getQuestion'
+      },
+
+      minUserLevel: 0,
+
+      credit: {
+
+        cost: 0,
+        earn: 0,
+        minNeeded: 0
+
+      },
+
+      serviceBuilder: function(req) {
+        return {
+          questionId: req.params.questionId
+        };
+      },
+
+      loaderAsync: function(services) {
+        return [
+          services.loadQuestion()
+        ]
+      },
+
+      canIDo: function(services) {
+        return true;
+      },
+
+      whatToDo: function(services) {},
+
+      successPostFlightAsync: function(services) {
+        return [];
+      },
+
+      successResponseBuilder: function(services) {
+        return {
+          toast: undefined,
+          data: services.getMyQuestion()
+        };
+      },
+
+      cantDoResponseBuilder: function(services) {
+        return {
+          toast: services.getCantDoMessagesStr(),
+          data: undefined
+        };
       }
 
     }
