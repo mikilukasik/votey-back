@@ -48,9 +48,22 @@ var rules = {
 
       },
 
+      serviceBuilder: function(req) {
+        return {
+          questionId: req.body.questionId
+        }
+      },
+
+      loaderAsync: function(services) {
+        return [
+          services.loadQuestion(),
+          services.loadClient()
+        ]
+      },
+
       canIDo: function(services) {
 
-        return services.not.alreadyVotedYes(); // && services.hasEnoughCredit.toVote.yes() && services.hasEnoughUserLevel.toVote.yes()
+        return services.not.alreadyVotedYes() // && services.hasEnoughCredit() && services.hasEnoughUserLevel()
 
       },
 
@@ -59,6 +72,26 @@ var rules = {
         services.registerYesVote();
         services.adjustUserCredit();
 
+      },
+
+      successPostFlightAsync: function(services) {
+        return [
+          services.doAndSaveData()
+        ]
+      },
+
+      successResponseBuilder: function(services) {
+        return {
+          toast: services.getSuccessMessagesStr(),
+          data: undefined
+        };
+      },
+
+      cantDoResponseBuilder: function(services) {
+        return {
+          toast: services.getCantDoMessagesStr(),
+          data: undefined
+        };
       }
 
     },
@@ -80,6 +113,19 @@ var rules = {
 
       },
 
+      serviceBuilder: function(req) {
+        return {
+          questionId: req.body.questionId
+        }
+      },
+
+      loaderAsync: function(services) {
+        return [
+          services.loadQuestion(),
+          services.loadClient()
+        ]
+      },
+
       canIDo: function(services) {
 
         return services.not.alreadyVotedNo() // && services.hasEnoughCredit() && services.hasEnoughUserLevel()
@@ -91,6 +137,26 @@ var rules = {
         services.registerNoVote();
         services.adjustUserCredit();
 
+      },
+
+      successPostFlightAsync: function(services) {
+        return [
+          services.doAndSaveData()
+        ]
+      },
+
+      successResponseBuilder: function(services) {
+        return {
+          toast: services.getSuccessMessagesStr(),
+          data: undefined
+        };
+      },
+
+      cantDoResponseBuilder: function(services) {
+        return {
+          toast: services.getCantDoMessagesStr(),
+          data: undefined
+        };
       }
 
     },
@@ -112,6 +178,19 @@ var rules = {
 
       },
 
+      serviceBuilder: function(req) {
+        return {
+          questionId: req.body.questionId
+        }
+      },
+
+      loaderAsync: function(services) {
+        return [
+          services.loadQuestion(),
+          services.loadClient()
+        ]
+      },
+
       canIDo: function(services) {
 
         return services.not.alreadyPromotedUp(); // && services.hasEnoughCredit.toPromote.up() && services.hasEnoughUserLevel.toPromote.up()
@@ -123,6 +202,26 @@ var rules = {
         services.registerUpPromotion();
         services.adjustUserCredit();
 
+      },
+
+      successPostFlightAsync: function(services) {
+        return [
+          services.doAndSaveData()
+        ]
+      },
+
+      successResponseBuilder: function(services) {
+        return {
+          toast: services.getSuccessMessagesStr(),
+          data: undefined
+        };
+      },
+
+      cantDoResponseBuilder: function(services) {
+        return {
+          toast: services.getCantDoMessagesStr(),
+          data: undefined
+        };
       }
 
     },
@@ -144,9 +243,22 @@ var rules = {
 
       },
 
+      serviceBuilder: function(req) {
+        return {
+          questionId: req.body.questionId
+        }
+      },
+
+      loaderAsync: function(services) {
+        return [
+          services.loadQuestion(),
+          services.loadClient()
+        ]
+      },
+
       canIDo: function(services) {
 
-        return services.not.alreadyPromotedDown(); // && services.hasEnoughCredit.toPromote.down() && services.hasEnoughUserLevel.toPromote.down()
+        return services.not.alreadyPromotedDown(); // && services.hasEnoughCredit.toPromote.up() && services.hasEnoughUserLevel.toPromote.up()
 
       },
 
@@ -155,6 +267,26 @@ var rules = {
         services.registerDownPromotion();
         services.adjustUserCredit();
 
+      },
+
+      successPostFlightAsync: function(services) {
+        return [
+          services.doAndSaveData()
+        ]
+      },
+
+      successResponseBuilder: function(services) {
+        return {
+          toast: services.getSuccessMessagesStr(),
+          data: undefined
+        };
+      },
+
+      cantDoResponseBuilder: function(services) {
+        return {
+          toast: services.getCantDoMessagesStr(),
+          data: undefined
+        };
       }
 
     },

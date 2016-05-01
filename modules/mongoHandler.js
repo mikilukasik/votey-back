@@ -33,7 +33,7 @@ var exporter = function(cn) {
       return new Promise(function(resolve, reject){
         if (connectedDb){
           return resolve(connectedDb);
-          console.log('this should never ever run!!!');
+          
         }
         dbService.connectToDb().then(function(){
           return resolve(connectedDb);
@@ -95,6 +95,7 @@ var exporter = function(cn) {
 
     dbService.ObjectID = mongodb.ObjectID;
 
+    dbService.connectToDb()
 
   }
 

@@ -9,6 +9,11 @@ module.exports = function(libs) {
   var seneca = this;
 
   seneca.add({
+    role: 'general',
+    cmd: 'dealWithUserAction'
+  }, dealWithUserAction);
+
+  seneca.add({
     role: 'vote',
     cmd: 'vote'
   }, vote);
@@ -92,34 +97,75 @@ module.exports = function(libs) {
 
   }
 
-  function promote(args, done) {
+  function dealWithUserAction(args, done) {
 
     var req = args.req;
-
-    var questionId = req.body.questionId;
-    var clientMongoId = req.get('clientMongoId');
-    var promoting = req.body.promoting;
+    var res = args.res;
+    var desiredAction = args.desiredAction;
 
     CanIDoServices.loadNew({
-        questionId: questionId,
-        clientMongoId: clientMongoId,
-        desiredAction: (promoting) ? 'promoteUp' : 'promoteDown'
+
+        desiredAction: desiredAction,
+
+        req: req,
+        res: res
+      
       })
       .then(function(services) {
 
         if (services.canIDo()) {
+          services.doSuccessPostFlightAsync().then(function() {
 
-          services.doAndSaveData().then(function() {
-            //success
-            var successStr = services.getSuccessMessagesStr();
-            console.log('Promotion registered and saved.');
+            done(null, services.buildSuccessResponse());
+
+          }, function(saveErr) {
+            //error in logic?
+
+            console.log('ERROR: some error in logic(?), canIdo true, but error in doAndSaveData: ', saveErr);
             done(null, {
               toast: {
-                type: 'success',
-                text: successStr
+                type: 'error',
+                text: 'ERROR: some error in logic(?), canIdo true, but error in doAndSaveData: ' + saveErr
               },
-              success: true
+              error: true
             });
+          });
+        } else {
+          //could not do action
+          done(null, services.buildCantDoResponse());
+
+        }
+
+      }, function(err) {
+        //could not load services
+
+        console.log('ERROR: Could not load services: ', err);
+        done(null, {
+          toast: {
+            type: 'error',
+            text: 'ERROR: Could not load services: ' + err
+          },
+          error: true
+        });
+
+      })
+
+  };
+
+  function promote(args, done) {
+
+    var req = args.req;
+
+    CanIDoServices.loadNew({
+        req: req,
+        desiredAction: (args.req.body.promoting) ? 'promoteUp' : 'promoteDown'
+      })
+      .then(function(services) {
+
+        if (services.canIDo()) {
+          services.doSuccessPostFlightAsync().then(function() {
+
+            done(null, services.buildSuccessResponse());
 
           }, function(saveErr) {
             //error in logic?
@@ -135,16 +181,7 @@ module.exports = function(libs) {
           });
         } else {
           //could not do action
-
-          var cantDoReason = services.getCantDoMessagesStr();
-          console.log('Could not do promotion, reason(s): ', cantDoReason);
-          done(null, {
-            toast: {
-              type: 'error',
-              text: cantDoReason
-            },
-            error: true
-          });
+          done(null, services.buildCantDoResponse());
 
         }
 
@@ -168,30 +205,16 @@ module.exports = function(libs) {
 
     var req = args.req;
 
-    var questionId = req.body.questionId;
-    var clientMongoId = req.get('clientMongoId');
-    var voting = req.body.voting;
-
     CanIDoServices.loadNew({
-        questionId: questionId,
-        clientMongoId: clientMongoId,
-        desiredAction: (voting) ? 'voteYes' : 'voteNo'
+        req: req,
+        desiredAction: (req.body.voting) ? 'voteYes' : 'voteNo'
       })
       .then(function(services) {
 
         if (services.canIDo()) {
-          console.log('fut')
-          services.doAndSaveData().then(function() {
-            //success
-            var successStr = services.getSuccessMessagesStr();
-            console.log('Vote registered and saved.');
-            done(null, {
-              toast: {
-                type: 'success',
-                text: successStr
-              },
-              success: true
-            });
+          services.doSuccessPostFlightAsync().then(function() {
+
+            done(null, services.buildSuccessResponse());
 
           }, function(saveErr) {
             //error in logic?
@@ -207,16 +230,7 @@ module.exports = function(libs) {
           });
         } else {
           //could not do action
-
-          var cantDoReason = services.getCantDoMessagesStr();
-          console.log('Could not do vote, reason(s): ', cantDoReason);
-          done(null, {
-            toast: {
-              type: 'error',
-              text: cantDoReason
-            },
-            error: true
-          });
+          done(null, services.buildCantDoResponse());
 
         }
 

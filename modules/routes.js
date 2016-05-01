@@ -47,9 +47,11 @@ var initRouter = function(router, app) {
   router.route('/promotions')
     .post(function(req, res) {
       seneca.act({
-        role: 'vote',
-        cmd: 'promote',
-        req: req
+        role: 'general',
+        cmd: 'dealWithUserAction',
+        req: req,
+        res: res,
+        desiredAction: (req.body.promoting) ? 'promoteUp' : 'promoteDown'
       }, function(err, resJson) {
         if(err) res.status(500).json({ error: 'seneca ERROR in router', details: err, req: req });
         res.json(resJson);
@@ -60,9 +62,11 @@ var initRouter = function(router, app) {
   router.route('/votes')
     .post(function(req, res) {
       seneca.act({
-        role: 'vote',
-        cmd: 'vote',
-        req: req
+        role: 'general',
+        cmd: 'dealWithUserAction',
+        req: req,
+        res: res,
+        desiredAction: (req.body.voting) ? 'voteYes' : 'voteNo'
       }, function(err, resJson) {
         if(err) res.status(500).json({ error: 'seneca ERROR in router', details: err, req: req });
         res.json(resJson);
