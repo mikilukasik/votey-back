@@ -57,8 +57,9 @@ var libs = {
 	rules: rules
 }
 
-seneca.use('./modules/loginActions.js', libs);
-seneca.use('./modules/voteActions.js', libs);
+seneca.use('./modules/sen.loginActions.js', libs);
+seneca.use('./modules/sen.voteActions.js', libs);
+seneca.use('./modules/sen.questionActions.js', libs);
 //seneca.use('./modules/idActions.js', libs);
 
 

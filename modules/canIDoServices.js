@@ -19,6 +19,7 @@ var exporter = function(libs) {
     services.desiredAction = params.desiredAction;
 
     services.newQuestion = params.newQuestion;
+    
 
     services.whatToSave = [];
 
@@ -54,19 +55,25 @@ var exporter = function(libs) {
 
       var userAction = (optionalUserAction) ? optionalUserAction : services.desiredAction;
 
-      rules.userActions[userAction].whatToDo(services); 
+      return rules.userActions[userAction].whatToDo(services); 
+    
     };
     services.loadQuestionList = function(query) {    //normally call first              
       return new Promise(function(resolve, reject) {
         db.query('questions', query).then(function(questionList) {
           services.questionList = questionList;
-          console.log('@@@@@@@@@@@@@@@@@@@@',questionList)
+          
             return resolve(questionList);
         },function(err){
           return reject(err)
         });
       });
     };
+
+    services.getMyQuestionList = function(){
+      return services.questionList;
+    };
+
     services.loadQuestion = function() {    //normally call first              
       return new Promise(function(resolve, reject) {
         db.findOne('questions', {
@@ -275,9 +282,7 @@ var exporter = function(libs) {
     //////////////////////////////  doIt  /////////////////////////////
 
     services.escalateQuestion = function() {
-      console.log(']]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]',services.question)
       services.question.votable = true;
-      console.log(']]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]')
 
       services.addToSave('question');
       services.messages.success.push('Question escalated.');
@@ -384,6 +389,7 @@ var exporter = function(libs) {
       services.question = {
         header: services.newQuestion.header,
         question: services.newQuestion.body,
+        postedBy: services.newQuestion.postedBy,
         promoteUp: 0,
         promoteDown: 0,
         voteUp: 0,

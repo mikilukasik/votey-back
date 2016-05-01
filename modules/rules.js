@@ -1,31 +1,31 @@
 var rules = {
 
-  //	user levels:
-  //	
-  //	0 - 4.9	: user
-  //	5 - 9.9	: admin
-  //	10			: developer
+  //  user levels:
+  //  
+  //  0 - 4.9 : user
+  //  5 - 9.9 : admin
+  //  10      : developer
 
   menuItems: {
 
-  	'Add Question': {
-  		minUserLevel: 5
-  	},
+    'Add Question': {
+      minUserLevel: 5
+    },
     'Promote Question': {
-    	minUserLevel: 0
-  	},
+      minUserLevel: 0
+    },
     'Vote': {
-    	minUserLevel: 0
-  	},
+      minUserLevel: 0
+    },
     'Login': {
-    	minUserLevel: 0
-  	},
+      minUserLevel: 0
+    },
     'Logoff': {
-    	minUserLevel: 0
-  	},
+      minUserLevel: 0
+    },
     'Developer': {
-    	minUserLevel: 10
-  	}
+      minUserLevel: 10
+    }
 
   },
 
@@ -50,7 +50,7 @@ var rules = {
 
       canIDo: function(services) {
 
-        return services.not.alreadyVotedYes();// && services.hasEnoughCredit.toVote.yes() && services.hasEnoughUserLevel.toVote.yes()
+        return services.not.alreadyVotedYes(); // && services.hasEnoughCredit.toVote.yes() && services.hasEnoughUserLevel.toVote.yes()
 
       },
 
@@ -58,7 +58,7 @@ var rules = {
 
         services.registerYesVote();
         services.adjustUserCredit();
-        
+
       }
 
     },
@@ -82,7 +82,7 @@ var rules = {
 
       canIDo: function(services) {
 
-        return services.not.alreadyVotedNo()// && services.hasEnoughCredit() && services.hasEnoughUserLevel()
+        return services.not.alreadyVotedNo() // && services.hasEnoughCredit() && services.hasEnoughUserLevel()
 
       },
 
@@ -90,7 +90,7 @@ var rules = {
 
         services.registerNoVote();
         services.adjustUserCredit();
-        
+
       }
 
     },
@@ -114,7 +114,7 @@ var rules = {
 
       canIDo: function(services) {
 
-        return services.not.alreadyPromotedUp();// && services.hasEnoughCredit.toPromote.up() && services.hasEnoughUserLevel.toPromote.up()
+        return services.not.alreadyPromotedUp(); // && services.hasEnoughCredit.toPromote.up() && services.hasEnoughUserLevel.toPromote.up()
 
       },
 
@@ -122,7 +122,6 @@ var rules = {
 
         services.registerUpPromotion();
         services.adjustUserCredit();
-        
 
       }
 
@@ -147,7 +146,7 @@ var rules = {
 
       canIDo: function(services) {
 
-        return services.not.alreadyPromotedDown();// && services.hasEnoughCredit.toPromote.down() && services.hasEnoughUserLevel.toPromote.down()
+        return services.not.alreadyPromotedDown(); // && services.hasEnoughCredit.toPromote.down() && services.hasEnoughUserLevel.toPromote.down()
 
       },
 
@@ -155,7 +154,6 @@ var rules = {
 
         services.registerDownPromotion();
         services.adjustUserCredit();
-        
 
       }
 
@@ -168,7 +166,7 @@ var rules = {
         action: 'postNewQuestion'
       },
 
-      minUserLevel: 5,	//admin
+      minUserLevel: 5, //admin
 
       credit: {
 
@@ -187,7 +185,6 @@ var rules = {
       whatToDo: function(services) {
 
         services.postNewQuestion();
-        
 
       }
 
@@ -200,7 +197,7 @@ var rules = {
         action: 'removeQuestion'
       },
 
-      minUserLevel: 5,	//admin
+      minUserLevel: 5, //admin
 
       credit: {
 
@@ -219,7 +216,7 @@ var rules = {
       whatToDo: function(services) {
 
         services.removeQuestion();
-  
+
       }
 
     },
@@ -231,7 +228,7 @@ var rules = {
         action: 'forceEscalateQuestion'
       },
 
-      minUserLevel: 5,	//admin
+      minUserLevel: 5, //admin
 
       credit: {
 
@@ -242,14 +239,71 @@ var rules = {
       },
 
       canIDo: function(services) {
-        return services.not.questionIsVotable();//hasEnoughCredit.toForceEscalateQuestion() && services.hasEnoughUserLevel.toForceEscalateQuestion()
+        return services.not.questionIsVotable(); //hasEnoughCredit.toForceEscalateQuestion() && services.hasEnoughUserLevel.toForceEscalateQuestion()
 
       },
 
       whatToDo: function(services) {
-        
+
         services.escalateQuestion();
-        
+
+      }
+
+    },
+
+    getVotableQuestions: {
+
+      name: {
+        type: 'userActions',
+        action: 'getVotableQuestions'
+      },
+
+      minUserLevel: 0,
+
+      credit: {
+
+        cost: 0,
+        earn: 0,
+        minNeeded: 0
+
+      },
+
+      canIDo: function(services) {
+        return true;
+      },
+
+      whatToDo: function(services) {
+
+        return services.getMyQuestionList();
+
+      }
+
+    },
+
+    getPromotableQuestions: {
+
+      name: {
+        type: 'userActions',
+        action: 'getPromotableQuestions'
+      },
+
+      minUserLevel: 0,
+
+      credit: {
+
+        cost: 0,
+        earn: 0,
+        minNeeded: 0
+
+      },
+
+      canIDo: function(services) {
+        return true;
+      },
+
+      whatToDo: function(services) {
+
+        return services.getMyQuestionList();
 
       }
 
@@ -261,8 +315,8 @@ var rules = {
 
     makeQuestionVotable: {
       minTotalPromotionNeeded: 20,
-      //	adminApprovalNeeded: false,
-      //	communityApprovalNeeded: true
+      //  adminApprovalNeeded: false,
+      //  communityApprovalNeeded: true
     }
 
   }

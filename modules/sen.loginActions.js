@@ -1,6 +1,6 @@
 module.exports = function(libs) {
 
-  var dbFuncs = libs.dbFuncs;
+  var db = libs.db;
   var _ = libs._;
   var rules = libs.rules;
   var CanIDoServices = libs.CanIDoServices;
@@ -23,12 +23,14 @@ module.exports = function(libs) {
 
     var req = args.req;
 
+    var clientMongoId = req.get('clientMongoId');
+
     var username = req.body.username;
     var password = req.body.password;
 
-    dbFuncs.findOne('clients', {
+    db.findOne('clients', {
       username: username
-    }, function(foundDoc) {
+    }).then(function(foundDoc) {
       if (foundDoc) {
         //username exists
 
@@ -77,6 +79,14 @@ module.exports = function(libs) {
         })
 
       };
+    },function(err){
+      done(null, {
+        toast: {
+          type: 'error',
+          text: err
+        },
+        error: true
+      });
     });
 
   };
@@ -84,13 +94,15 @@ module.exports = function(libs) {
   function register(args, done) {
     var req = args.req;
 
+    var clientMongoId = req.get('clientMongoId');
+
     var username = req.body.username;
     var password = req.body.password;
     var hardWareId = req.body.hardWareId;
 
-    dbFuncs.findOne('clients', {
+    db.findOne('clients', {
       username: username
-    }, function(foundDoc) {
+    }).then(function(foundDoc) {
       if (foundDoc) {
         //username exists
 
@@ -136,6 +148,14 @@ module.exports = function(libs) {
 
         });
       };
+    },function(err){
+      done(null, {
+        toast: {
+          type: 'error',
+          text: err
+        },
+        error: true
+      });
     });
 
     // ... perform item creation
