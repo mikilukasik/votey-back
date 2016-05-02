@@ -165,6 +165,60 @@ var exporter = function(libs) {
 
     };
 
+    services.moveVotedQuestionsToEndOfList = function(){
+      var touched = [];
+      var untouched = [];
+      services.questionList.forEach(function(question){
+        if(question.previousVote){
+          touched.push(question);
+        } else {
+          untouched.push(question);
+        }
+        services.questionList = untouched.concat(touched);
+      });
+    };
+
+    services.movePromotedQuestionsToEndOfList = function(){
+      var touched = [];
+      var untouched = [];
+      services.questionList.forEach(function(question){
+        if(question.previousPromotion){
+          touched.push(question);
+        } else {
+          untouched.push(question);
+        }
+        services.questionList = untouched.concat(touched);
+      });
+    };
+
+    services.sortQuestionsByNumberOfVotes = function() {
+      services.questionList.sort(function(a,b){
+        if(a.voteUp + a.voteDown > b.voteUp + b.voteDown){
+          return -1;
+        }else{
+          if(a.voteUp + a.voteDown < b.voteUp + b.voteDown){
+            return 1;
+          }else{
+            return 0;
+          }
+        }
+      })
+    },
+
+    services.sortQuestionsByNumberOfPromotions = function() {
+      services.questionList.sort(function(a,b){
+        if(a.promoteUp + a.promoteDown > b.promoteUp + b.promoteDown){
+          return -1;
+        }else{
+          if(a.promoteUp + a.promoteDown < b.promoteUp + b.promoteDown){
+            return 1;
+          }else{
+            return 0;
+          }
+        }
+      })
+    },
+
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -418,21 +472,30 @@ var exporter = function(libs) {
       services.messages.success.push('Question added.')
     };
 
+    services.addMyPreviousVoteToQuestionInParam = function(question){
+      var myPreviousVoteForThisQuestion = _.find(services.client.votes,function(previousVote){
+        return previousVote.questionId == question._id
+      });
+      if (myPreviousVoteForThisQuestion) question.previousVote = (myPreviousVoteForThisQuestion.voting) ? 'yes' : 'no';
+
+    };
+
+    services.addMyPreviousPromotionToQuestionInParam = function(question){
+      var myPreviousPromotionForThisQuestion = _.find(services.client.promotions,function(previousPromotion){
+        return previousPromotion.questionId == question._id
+      });
+      if (myPreviousPromotionForThisQuestion) question.previousPromotion = (myPreviousPromotionForThisQuestion.promoting) ? 'up' : 'down';
+    };
+
     services.addMyVotesToQuestionList = function() {
       services.questionList.forEach(function(question){
-        var myPreviousVoteForThisQuestion = _.find(services.client.votes,function(previousVote){
-          return previousVote.questionId == question._id
-        });
-        if (myPreviousVoteForThisQuestion) question.previousVote = (myPreviousVoteForThisQuestion.voting) ? 'yes' : 'no';
+        services.addMyPreviousVoteToQuestionInParam(question);
       })
     };
 
     services.addMyPromotionsToQuestionList = function() {
       services.questionList.forEach(function(question){
-        var myPreviousPromotionForThisQuestion = _.find(services.client.promotions,function(previousPromotion){
-          return previousPromotion.questionId == question._id
-        });
-        if (myPreviousPromotionForThisQuestion) question.previousPromotion = (myPreviousPromotionForThisQuestion.promoting) ? 'up' : 'down';
+        services.addMyPreviousPromotionToQuestionInParam(question);
       })
     };
 

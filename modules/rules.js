@@ -485,6 +485,8 @@ var rules = {
 
       whatToDo: function(services) {
         services.addMyVotesToQuestionList();
+        services.sortQuestionsByNumberOfVotes();
+        services.moveVotedQuestionsToEndOfList();
       },
 
       successPostFlightAsync: function(services) {
@@ -544,6 +546,8 @@ var rules = {
 
       whatToDo: function(services) {
         services.addMyPromotionsToQuestionList();
+        services.sortQuestionsByNumberOfPromotions();
+        services.movePromotedQuestionsToEndOfList();
       },
 
       successPostFlightAsync: function(services) {
@@ -591,7 +595,8 @@ var rules = {
 
       loaderAsync: function(services) {
         return [
-          services.loadQuestion()
+          services.loadQuestion(),
+          services.loadClient()
         ]
       },
 
@@ -599,7 +604,10 @@ var rules = {
         return true;
       },
 
-      whatToDo: function(services) {},
+      whatToDo: function(services) {
+        services.addMyPreviousVoteToQuestionInParam(services.question);
+        services.addMyPreviousPromotionToQuestionInParam(services.question);
+      },
 
       successPostFlightAsync: function(services) {
         return [];
