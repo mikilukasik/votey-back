@@ -147,14 +147,25 @@ var exporter = function(libs) {
       return Promise.all(savingPromises);
     };
 
-    services.doAndSaveData = function(optionalUserAction) {
+    // services.doAndSaveData = function(optionalUserAction) {
+
+    //   var userAction = (optionalUserAction) ? optionalUserAction : services.desiredAction;
+
+    //   services.doIt(userAction);
+    //   return services.saveData();
+
+    // };
+
+    services.justDoIt = function(optionalUserAction) {
 
       var userAction = (optionalUserAction) ? optionalUserAction : services.desiredAction;
 
       services.doIt(userAction);
-      return services.saveData();
+      return new Promise(function(res,rej){res()})
 
     };
+
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -405,6 +416,24 @@ var exporter = function(libs) {
       };
       services.addToSave('question');
       services.messages.success.push('Question added.')
+    };
+
+    services.addMyVotesToQuestionList = function() {
+      services.questionList.forEach(function(question){
+        var myPreviousVoteForThisQuestion = _.find(services.client.votes,function(previousVote){
+          return previousVote.questionId == question._id
+        });
+        if (myPreviousVoteForThisQuestion) question.previousVote = (myPreviousVoteForThisQuestion.voting) ? 'yes' : 'no';
+      })
+    };
+
+    services.addMyPromotionsToQuestionList = function() {
+      services.questionList.forEach(function(question){
+        var myPreviousPromotionForThisQuestion = _.find(services.client.promotions,function(previousPromotion){
+          return previousPromotion.questionId == question._id
+        });
+        if (myPreviousPromotionForThisQuestion) question.previousPromotion = (myPreviousPromotionForThisQuestion.promoting) ? 'up' : 'down';
+      })
     };
 
     services.adjustUserCredit = function() {

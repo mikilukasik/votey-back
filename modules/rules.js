@@ -76,13 +76,13 @@ var rules = {
 
       successPostFlightAsync: function(services) {
         return [
-          services.doAndSaveData()
+          services.saveData()
         ]
       },
 
       successResponseBuilder: function(services) {
         return {
-          toast: services.getSuccessMessagesStr(),
+          toast: undefined,//undefined,//services.getSuccessMessagesStr(),
           data: undefined
         };
       },
@@ -141,13 +141,13 @@ var rules = {
 
       successPostFlightAsync: function(services) {
         return [
-          services.doAndSaveData()
+          services.saveData()
         ]
       },
 
       successResponseBuilder: function(services) {
         return {
-          toast: services.getSuccessMessagesStr(),
+          toast: undefined,//services.getSuccessMessagesStr(),
           data: undefined
         };
       },
@@ -206,13 +206,13 @@ var rules = {
 
       successPostFlightAsync: function(services) {
         return [
-          services.doAndSaveData()
+          services.saveData()
         ]
       },
 
       successResponseBuilder: function(services) {
         return {
-          toast: services.getSuccessMessagesStr(),
+          toast: undefined,//services.getSuccessMessagesStr(),
           data: undefined
         };
       },
@@ -271,13 +271,13 @@ var rules = {
 
       successPostFlightAsync: function(services) {
         return [
-          services.doAndSaveData()
+          services.saveData()
         ]
       },
 
       successResponseBuilder: function(services) {
         return {
-          toast: services.getSuccessMessagesStr(),
+          toast: undefined,//services.getSuccessMessagesStr(),
           data: undefined
         };
       },
@@ -336,13 +336,13 @@ var rules = {
 
       successPostFlightAsync: function(services) {
         return [
-          services.doAndSaveData()
+          services.saveData()
         ]
       },
 
       successResponseBuilder: function(services) {
         return {
-          toast: services.getSuccessMessagesStr(),
+          toast: undefined,//services.getSuccessMessagesStr(),
           data: undefined
         };
       },
@@ -429,7 +429,7 @@ var rules = {
 
       successPostFlightAsync: function(services) {
         return [
-          services.doAndSaveData()
+          services.saveData()
         ]
       },
 
@@ -474,7 +474,8 @@ var rules = {
         return [
           services.loadQuestionList({
             votable: true
-          })
+          }),
+          services.loadClient()
         ]
       },
 
@@ -482,7 +483,9 @@ var rules = {
         return true;
       },
 
-      whatToDo: function(services) {},
+      whatToDo: function(services) {
+        services.addMyVotesToQuestionList();
+      },
 
       successPostFlightAsync: function(services) {
         return [];
@@ -530,7 +533,8 @@ var rules = {
         return [
           services.loadQuestionList({
             votable: false
-          })
+          }),
+          services.loadClient()
         ]
       },
 
@@ -538,7 +542,9 @@ var rules = {
         return true;
       },
 
-      whatToDo: function(services) {},
+      whatToDo: function(services) {
+        services.addMyPromotionsToQuestionList();
+      },
 
       successPostFlightAsync: function(services) {
         return [];

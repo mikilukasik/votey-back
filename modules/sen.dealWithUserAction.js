@@ -26,6 +26,9 @@ module.exports = function(libs) {
       .then(function(services) {
 
         if (services.canIDo()) {
+
+          services.doIt();
+
           services.doSuccessPostFlightAsync().then(function() {
 
             done(null, services.buildSuccessResponse());
