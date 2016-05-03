@@ -466,7 +466,8 @@ var exporter = function(libs) {
         promoteDown: 0,
         voteUp: 0,
         voteDown: 0,
-        votable: false
+        votable: false,
+        comments: []
       };
       services.addToSave('question');
       services.messages.success.push('Question added.')
