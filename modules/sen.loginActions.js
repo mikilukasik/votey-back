@@ -120,7 +120,7 @@ module.exports = function(libs) {
         //new user
         bcrypt.hash(password, 10, function(err, hash) {
 
-          dbFuncs.insert('clients', {
+          db.save('clients', {
 
             username: username,
             passwordHash: hash,
@@ -131,7 +131,7 @@ module.exports = function(libs) {
             preferences: {
 
             }
-          }, function(client) {
+          }).then(function(client) {
             
 
             done(null, {
@@ -144,6 +144,8 @@ module.exports = function(libs) {
               clientMongoId: client._id
             });
 
+          },function(err){
+            done(null,err);
           });
 
         });
