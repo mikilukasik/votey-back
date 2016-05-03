@@ -43,18 +43,24 @@ var router = express.Router()
 
 var seneca = require('seneca')();
 
+var classes = require('./modules/canIDoServices.js');
+
 var CanIDoServices = require('./modules/canIDoServices.js')({
 	_: _,
 	db: db,
-	rules: rules
+	rules: rules,
+	classes: classes
 })
+
+
 
 var libs = {
 	db: db,
 	_: _,
 	bcrypt: bcrypt,
 	CanIDoServices: CanIDoServices,
-	rules: rules
+	rules: rules,
+	classes: classes
 }
 
 seneca.use('./modules/sen.loginActions.js', libs);
