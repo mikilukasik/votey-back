@@ -3,6 +3,7 @@ var exporter = function(libs) {
   var _ = libs._;
   var db = libs.db;
   var rules = libs.rules;
+  var classes = libs.classes;
 
   var CanIDoServices = function(params) { //class
 
@@ -64,7 +65,7 @@ var exporter = function(libs) {
 
     services.shortenQuestionBodiesInList = function(){
       services.questionList.forEach(function(question){
-        if(question.question.length > rules.shortenedQuestionBodyLength) question.question = question.question.substring(0,rules.shortenedQuestionBodyLength) + '...';
+        if(question.body.length > rules.shortenedQuestionBodyLength) question.body = question.body.substring(0,rules.shortenedQuestionBodyLength) + '...';
       });
     };
 
@@ -469,18 +470,11 @@ var exporter = function(libs) {
     };
 
     services.postNewQuestion = function() {
-      services.question = {
+      services.question = new classes.Question ({
         header: services.newQuestion.header,
-        question: services.newQuestion.body,
-        postedBy: services.clientMongoId,
-        promoteUp: 0,
-        promoteDown: 0,
-        voteUp: 0,
-        voteDown: 0,
-        votable: false,
-        comments: [],
-        numberOfComments: 0
-      };
+        body: services.newQuestion.body,
+        postedBy: services.clientMongoId
+      }),
       services.addToSave('question');
       services.messages.success.push('Question added.')
     };
