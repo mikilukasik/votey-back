@@ -64,7 +64,7 @@ var exporter = function(libs) {
 
     services.shortenQuestionBodiesInList = function(){
       services.questionList.forEach(function(question){
-        if(question.question.length > 10) question.question = question.question.substring(0,10) + '...';
+        if(question.question.length > rules.shortenedQuestionBodyLength) question.question = question.question.substring(0,rules.shortenedQuestionBodyLength) + '...';
       });
     };
 

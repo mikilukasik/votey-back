@@ -5,6 +5,8 @@ var rules = {
   //  0 - 4.9 : user
   //  5 - 9.9 : admin
   //  10      : developer
+  shortenedQuestionBodyLength : 50,
+
 
   menuItems: {
 
