@@ -344,7 +344,7 @@ var rules = {
 
       successResponseBuilder: function(services) {
         return {
-          toast: undefined,//services.getSuccessMessagesStr(),
+          toast: services.getSuccessMessagesStr(),
           data: undefined
         };
       },

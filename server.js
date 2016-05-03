@@ -43,7 +43,7 @@ var router = express.Router()
 
 var seneca = require('seneca')();
 
-var classes = require('./modules/canIDoServices.js');
+var classes = require('./modules/classes.js');
 
 var CanIDoServices = require('./modules/canIDoServices.js')({
 	_: _,
