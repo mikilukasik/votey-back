@@ -372,6 +372,7 @@ var exporter = function(libs) {
 
     services.addNewCommentToQuestion = function() {
       services.question.comments.push(services.newComment);
+      services.question.numberOfComments ++;
       services.addToSave('question');
     };
 
@@ -477,7 +478,8 @@ var exporter = function(libs) {
         voteUp: 0,
         voteDown: 0,
         votable: false,
-        comments: []
+        comments: [],
+        numberOfComments: 0
       };
       services.addToSave('question');
       services.messages.success.push('Question added.')
