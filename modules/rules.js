@@ -487,6 +487,7 @@ var rules = {
         services.addMyVotesToQuestionList();
         services.sortQuestionsByNumberOfVotes();
         services.moveVotedQuestionsToEndOfList();
+        services.shortenQuestionBodiesInList();
       },
 
       successPostFlightAsync: function(services) {
@@ -548,6 +549,7 @@ var rules = {
         services.addMyPromotionsToQuestionList();
         services.sortQuestionsByNumberOfPromotions();
         services.movePromotedQuestionsToEndOfList();
+        services.shortenQuestionBodiesInList();
       },
 
       successPostFlightAsync: function(services) {

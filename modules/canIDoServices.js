@@ -55,11 +55,16 @@ var exporter = function(libs) {
       return new Promise(function(resolve, reject) {
         db.query('questions', query, { comments: 0 }).then(function(questionList) {
           services.questionList = questionList;
-
-          return resolve(questionList);
+          return resolve(services.questionList);
         }, function(err) {
           return reject(err)
         });
+      });
+    };
+
+    services.shortenQuestionBodiesInList = function(){
+      services.questionList.forEach(function(question){
+        if(question.question.length > 10) question.question = question.question.substring(0,10) + '...';
       });
     };
 
