@@ -44,10 +44,11 @@ var exporter = function(cn) {
       });
     };
 
-    dbService.query = function(collectionName, query) {  
+    dbService.query = function(collectionName, query, projection) {  
+      if(!projection) projection = {};
       return new Promise(function(resolve, reject){
         getDb().then(function(db){
-          db.collection(collectionName).find(query).toArray(function(err,items){
+          db.collection(collectionName).find(query,projection).toArray(function(err,items){
             if(err) return reject(err);
             return resolve(items);
           })
