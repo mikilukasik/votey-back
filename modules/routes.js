@@ -9,6 +9,19 @@ var initRouter = function(router, app) {
   });
   app.use('/api', router);
 
+  router.route('/clearDb') //register
+    .post(function(req, res) 
+    {
+      console.log('ClearDb received')
+
+      Promise.all([db.dropCollection('clients'),db.dropCollection('questions')]).then(function(){
+        res.json({ok:1});
+      },function(err){
+        res.status(500).json(err);
+      })
+      
+    });
+
   ////////////////////////  login  ///////////////////////
 
   router.route('/login') //register

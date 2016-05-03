@@ -44,6 +44,21 @@ var exporter = function(cn) {
       });
     };
 
+    dbService.dropCollection = function(collectionName) {  
+      
+      return new Promise(function(resolve, reject){
+        getDb().then(function(db){
+          db.collection(collectionName).deleteMany({},function(errDrop,resultDrop){
+            if(errDrop) return reject(errDrop);
+            return resolve(resultDrop);
+          })
+        },function(err){
+          console.log('db.dropCollection ERROR: ', err);
+          return reject(err);
+        })
+      });
+    };
+
     dbService.query = function(collectionName, query, projection) {  
       if(!projection) projection = {};
       return new Promise(function(resolve, reject){
