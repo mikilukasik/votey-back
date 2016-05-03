@@ -104,6 +104,20 @@ var initRouter = function(router, app) {
       });
     });
 
+  router.route('/questions/:questionId/comments')
+    .post(function(req, res) {
+      seneca.act({
+        role: 'general',
+        cmd: 'dealWithUserAction',
+        req: req,
+        res: res,
+        desiredAction: 'postNewComment'
+      }, function(err, resJson) {
+        if(err) res.status(500).json({ error: 'seneca ERROR in router', details: err, req: req });
+        res.json(resJson);
+      });
+    });
+
   router.route('/questions/votables')
     .get(function(req, res) {
       seneca.act({

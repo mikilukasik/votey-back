@@ -370,6 +370,11 @@ var exporter = function(libs) {
 
     };
 
+    services.addNewCommentToQuestion = function() {
+      services.question.comments.push(services.newComment);
+      services.addToSave('question');
+    };
+
     services.registerUpPromotion = function() {
 
       var firstPromotion = !services.registeredPromotion();
