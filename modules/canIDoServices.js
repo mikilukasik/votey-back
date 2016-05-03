@@ -53,7 +53,7 @@ var exporter = function(libs) {
     };
     services.loadQuestionList = function(query) { //async              
       return new Promise(function(resolve, reject) {
-        db.query('questions', query).then(function(questionList) {
+        db.query('questions', query, { header: 1 }).then(function(questionList) {
           services.questionList = questionList;
 
           return resolve(questionList);
