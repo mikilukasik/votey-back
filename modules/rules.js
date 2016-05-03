@@ -5,7 +5,7 @@ var rules = {
   //  0 - 4.9 : user
   //  5 - 9.9 : admin
   //  10      : developer
-  shortenedQuestionBodyLength : 50,
+  shortenedQuestionBodyLength : 150,      //max number of characters of question body that can be displayed on a card (list)
 
 
   menuItems: {
