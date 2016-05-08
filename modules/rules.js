@@ -869,9 +869,9 @@ var rules = {
       loaderAsync: function(services) {
         return [
           services.loadQuestionList({
-            reportedBy: { $gt: [] }
-          }),
-          services.loadClient()
+            reportedBy: { $exists: true, $not: {$size: 0} }
+          })
+          //,services.loadClient()
         ]
       },
 
@@ -929,10 +929,10 @@ var rules = {
 
       loaderAsync: function(services) {
         return [
-          services.loadQuestionList({
-            votable: true
-          }),
-          services.loadClient()
+          services.loadQuestionListWithComments({
+            hasReportedCommets: true
+          })
+          //,services.loadClient()
         ]
       },
 
@@ -941,11 +941,8 @@ var rules = {
       },
 
       whatToDo: function(services) {
-        services.filterOutQuestionsIReported();
-        services.addMyVotesToQuestionList();
-        services.sortQuestionsByNumberOfVotes();
-        services.moveVotedQuestionsToEndOfList();
-        services.shortenQuestionBodiesInList();
+        services.buildReportedCommentsList();
+        services.sortReportedCommentsListByNumberOfReports();
       },
 
       successPostFlightAsync: function(services) {
@@ -955,7 +952,7 @@ var rules = {
       successResponseBuilder: function(services) {
         return {
           toast: undefined,
-          data: services.getMyQuestionList()
+          data: services.reportedCommentsList
         };
       },
 

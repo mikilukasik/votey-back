@@ -63,6 +63,18 @@ var exporter = function(libs) {
       });
     };
 
+    services.loadQuestionListWithComments = function(query) { //async              
+      return new Promise(function(resolve, reject) {
+        db.query('questions', query).then(function(questionList) {
+          services.questionList = questionList;
+          return resolve(services.questionList);
+        }, function(err) {
+          return reject(err)
+        });
+      });
+    };
+
+
     services.shortenQuestionBodiesInList = function(){
       services.questionList.forEach(function(question){
         console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@',question)
@@ -468,6 +480,36 @@ var exporter = function(libs) {
         
     };
 
+    services.buildReportedCommentsList = function(){
+
+      services.reportedCommentsList = [];
+      var i = services.questionList.length;
+      while(i--){
+        var j = services.questionList[i].comments.length;
+        while(j--){
+
+          if(services.questionList[i].comments[j].reportedBy.length > 0){
+
+            services.reportedCommentsList.push(services.questionList[i].comments[j]);
+
+          }
+        }
+      };
+    };
+
+    services.sortReportedCommentsListByNumberOfReports = function(){
+      services.reportedCommentsList.sort(function(a,b){
+        if(a.reportedBy.length > b.reportedBy.length){
+          return -1;
+        }else{
+          if(a.reportedBy.length < b.reportedBy.length){
+            return 1;
+          }else{
+            return 0;
+          }
+        }
+      })
+    };
 
     services.filterOutCommentsIReported = function() {
       var i = services.question.comments.length;
@@ -489,6 +531,8 @@ var exporter = function(libs) {
           var thisComment = services.question.comments[i];
 
           thisComment.reportedBy.push(services.clientMongoId);
+
+          services.question.hasReportedCommets = true;
 
           services.messages.success.push('Comment reported.');
           services.addToSave('question');
