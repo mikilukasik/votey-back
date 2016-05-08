@@ -488,6 +488,75 @@ var rules = {
     },
 
 
+    updateComment: {
+
+      name: {
+        type: 'userActions',
+        action: 'updateComment'
+      },
+
+      minUserLevel: 0, 
+
+      credit: {
+
+        cost: 0,
+        earn: 0,
+        minNeeded: 0
+
+      },
+
+      serviceBuilder: function(req) {
+        return {
+          commentId: req.params.commentId,
+          questionId: req.params.questionId,
+
+          comment: req.body.comment,
+        };
+      },
+
+      loaderAsync: function(services) {
+        return [
+          services.loadQuestion()
+        ];
+      },
+
+      canIDo: function(services) {
+
+
+
+        return true;//services.not.alreadyReportedComment()  ;//true;//services.not.questionHeaderExists() //services.hasEnoughCredit() && services.hasEnoughUserLevel()
+
+      },
+
+      whatToDo: function(services) {
+
+        services.updateCommentOnQuestion();
+
+      },
+
+      successPostFlightAsync: function(services) {
+        return [
+          services.saveData()
+        ]
+      },
+
+      successResponseBuilder: function(services) {
+        return {
+          toast: undefined,//services.getSuccessMessagesStr(),
+          data: undefined
+        };
+      },
+
+      cantDoResponseBuilder: function(services) {
+        return {
+          toast: services.getCantDoMessagesStr(),
+          data: undefined
+        };
+      }
+
+    },
+
+
     reportComment: {
 
       name: {

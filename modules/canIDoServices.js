@@ -451,6 +451,21 @@ var exporter = function(libs) {
       
     };
 
+    services.updateCommentOnQuestion = function() {
+      var i = services.question.comments.length;
+      while(i--){
+        if(services.question.comments[i].id == services.commentId) {
+          
+          services.question.comments[i] = services.comment;
+
+          
+          services.messages.success.push('Comment updated.');
+          services.addToSave('question');
+        };
+      };
+      
+    };
+
     services.registerUpPromotion = function() {
 
       var firstPromotion = !services.registeredPromotion();
