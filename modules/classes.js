@@ -14,7 +14,7 @@ var rules = {
     question.votable = false;
     question.comments = [];
     question.numberOfComments = 0;
-
+    question.reportedBy = [];
 
     if(definedPropertiesObject) for (key in definedPropertiesObject){ question[key] = definedPropertiesObject[key]; }
   

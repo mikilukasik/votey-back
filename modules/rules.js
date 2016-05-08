@@ -623,6 +623,72 @@ var rules = {
 
     },
 
+    reportQuestion: {
+
+      name: {
+        type: 'userActions',
+        action: 'reportQuestion'
+      },
+
+      minUserLevel: 0, 
+
+      credit: {
+
+        cost: 0,
+        earn: 0,
+        minNeeded: 0
+
+      },
+
+      serviceBuilder: function(req) {
+        return {
+          questionId: req.params.questionId
+        };
+      },
+
+      loaderAsync: function(services) {
+        return [
+          services.loadQuestion()
+        ];
+      },
+
+      canIDo: function(services) {
+
+
+
+        return services.not.alreadyReportedQuestion()  ;//true;//services.not.questionHeaderExists() //services.hasEnoughCredit() && services.hasEnoughUserLevel()
+
+      },
+
+      whatToDo: function(services) {
+
+        services.reportQuestion();
+
+      },
+
+      successPostFlightAsync: function(services) {
+        return [
+          services.saveData()
+        ]
+      },
+
+      successResponseBuilder: function(services) {
+        return {
+          toast: undefined,//services.getSuccessMessagesStr(),
+          data: undefined
+        };
+      },
+
+      cantDoResponseBuilder: function(services) {
+        return {
+          toast: services.getCantDoMessagesStr(),
+          data: undefined
+        };
+      }
+
+    },
+
+
     removeQuestion: {
 
       name: {
@@ -751,6 +817,131 @@ var rules = {
       },
 
       whatToDo: function(services) {
+        services.filterOutQuestionsIReported();
+        services.addMyVotesToQuestionList();
+        services.sortQuestionsByNumberOfVotes();
+        services.moveVotedQuestionsToEndOfList();
+        services.shortenQuestionBodiesInList();
+      },
+
+      successPostFlightAsync: function(services) {
+        return [];
+      },
+
+      successResponseBuilder: function(services) {
+        return {
+          toast: undefined,
+          data: services.getMyQuestionList()
+        };
+      },
+
+      cantDoResponseBuilder: function(services) {
+        return {
+          toast: services.getCantDoMessagesStr(),
+          data: undefined
+        };
+      }
+
+
+    },
+
+    getQuestionsToReview: {
+
+      name: {
+        type: 'userActions',
+        action: 'getQuestionsToReview'
+      },
+
+      minUserLevel: 0,
+
+      credit: {
+
+        cost: 0,
+        earn: 0,
+        minNeeded: 0
+
+      },
+
+      serviceBuilder: function(req) {
+        return {};
+      },
+
+      loaderAsync: function(services) {
+        return [
+          services.loadQuestionList({
+            reportedBy: { $gt: [] }
+          }),
+          services.loadClient()
+        ]
+      },
+
+      canIDo: function(services) {
+        return true;
+      },
+
+      whatToDo: function(services) {
+        
+        services.sortQuestionsByNumberOfReports();
+        
+      },
+
+      successPostFlightAsync: function(services) {
+        return [];
+      },
+
+      successResponseBuilder: function(services) {
+        return {
+          toast: undefined,
+          data: services.getMyQuestionList()
+        };
+      },
+
+      cantDoResponseBuilder: function(services) {
+        return {
+          toast: services.getCantDoMessagesStr(),
+          data: undefined
+        };
+      }
+
+
+    },
+
+    getCommentsToReview: {
+
+      name: {
+        type: 'userActions',
+        action: 'getCommentsToReview'
+      },
+
+      minUserLevel: 0,
+
+      credit: {
+
+        cost: 0,
+        earn: 0,
+        minNeeded: 0
+
+      },
+
+      serviceBuilder: function(req) {
+        return {};
+      },
+
+      loaderAsync: function(services) {
+        return [
+          services.loadQuestionList({
+            votable: true
+          }),
+          services.loadClient()
+        ]
+      },
+
+      canIDo: function(services) {
+        return true;
+      },
+
+      whatToDo: function(services) {
+        services.filterOutQuestionsIReported();
         services.addMyVotesToQuestionList();
         services.sortQuestionsByNumberOfVotes();
         services.moveVotedQuestionsToEndOfList();
@@ -813,6 +1004,7 @@ var rules = {
       },
 
       whatToDo: function(services) {
+        services.filterOutQuestionsIReported();
         services.addMyPromotionsToQuestionList();
         services.sortQuestionsByNumberOfPromotions();
         services.movePromotedQuestionsToEndOfList();

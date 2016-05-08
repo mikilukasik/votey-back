@@ -226,6 +226,20 @@ var exporter = function(libs) {
       })
     },
 
+    services.sortQuestionsByNumberOfReports = function() {
+      services.questionList.sort(function(a,b){
+        if(a.reportedBy.length > b.reportedBy.length){
+          return -1;
+        }else{
+          if(a.reportedBy.length < b.reportedBy.length){
+            return 1;
+          }else{
+            return 0;
+          }
+        }
+      })
+    },
+
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -305,6 +319,26 @@ var exporter = function(libs) {
       services.messages.cantDo.push('Question is votable.')
     };
 
+    services.alreadyReportedQuestion = function(dontPushMsg){
+      
+          
+          var j = services.question.reportedBy.length;
+
+          while(j--){
+            if(services.question.reportedBy[j] == services.clientMongoId) return true;
+          }
+
+      if (!dontPushMsg) services.messages.cantDo.push('Did not report question yet.')
+
+    };
+
+    services.not.alreadyReportedQuestion = function() {
+
+      if (!services.alreadyReportedQuestion(1)) return true;
+
+      services.messages.cantDo.push('Already reported question.')
+    };
+
     services.alreadyReportedComment = function(dontPushMsg){
       var i = services.question.comments.length;
       while(i--){
@@ -324,7 +358,7 @@ var exporter = function(libs) {
 
       if (!dontPushMsg) services.messages.cantDo.push('Did not report comment yet.')
 
-    }
+    };
 
     services.not.alreadyReportedComment = function() {
 
@@ -422,6 +456,18 @@ var exporter = function(libs) {
       }
       
     };
+    services.filterOutQuestionsIReported = function() {
+      
+        
+        var j = services.questionList.length;
+        while(j--){
+          if(_.some(services.questionList[j].reportedBy,function(thisReporter){ return thisReporter == services.clientMongoId })) {
+            services.questionList.splice(j,1);
+          }
+        };
+        
+    };
+
 
     services.filterOutCommentsIReported = function() {
       var i = services.question.comments.length;
@@ -448,6 +494,16 @@ var exporter = function(libs) {
           services.addToSave('question');
         };
       };
+      
+    };
+
+    services.reportQuestion = function() {
+     
+          services.question.reportedBy.push(services.clientMongoId);
+
+          services.messages.success.push('Question reported.');
+          services.addToSave('question');
+       
       
     };
 

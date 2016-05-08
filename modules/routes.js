@@ -173,6 +173,21 @@ var initRouter = function(router, app) {
       });
     });
 
+  router.route('/questions/:questionId/report')
+    .post(function(req, res) {
+      seneca.act({
+        role: 'general',
+        cmd: 'dealWithUserAction',
+        req: req,
+        res: res,
+        desiredAction: 'reportQuestion'
+      }, function(err, resJson) {
+        if(err) res.status(500).json({ error: 'seneca ERROR in router', details: err, req: req.params });
+        res.json(resJson);
+      });
+    });
+
+
   router.route('/questions/votables')
     .get(function(req, res) {
       seneca.act({
@@ -186,6 +201,34 @@ var initRouter = function(router, app) {
         res.json(resJson);
       });
     });
+
+  router.route('/questions/toReview')
+    .get(function(req, res) {
+      seneca.act({
+        role: 'general',
+        cmd: 'dealWithUserAction',
+        req: req,
+        res: res,
+        desiredAction: 'getQuestionsToReview'
+      }, function(err, resJson) {
+        if(err) res.status(500).json({ error: 'seneca ERROR in router', details: err, req: req.params });
+        res.json(resJson);
+      });
+    });
+    
+  router.route('/comments/toReview')
+    .get(function(req, res) {
+      seneca.act({
+        role: 'general',
+        cmd: 'dealWithUserAction',
+        req: req,
+        res: res,
+        desiredAction: 'getCommentsToReview'
+      }, function(err, resJson) {
+        if(err) res.status(500).json({ error: 'seneca ERROR in router', details: err, req: req.params });
+        res.json(resJson);
+      });
+    });    
 
   router.route('/questions/promotables')
     .get(function(req, res) {
