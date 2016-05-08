@@ -305,6 +305,34 @@ var exporter = function(libs) {
       services.messages.cantDo.push('Question is votable.')
     };
 
+    services.alreadyReportedComment = function(dontPushMsg){
+      var i = services.question.comments.length;
+      while(i--){
+        if(services.question.comments[i].id == services.commentId) {
+          
+          var j = services.question.comments[i].reportedBy.length;
+
+          while(j--){
+            if(services.question.comments[i].reportedBy[j] == services.clientMongoId) return true;
+          }
+
+
+          
+          
+        }
+      }
+
+      if (!dontPushMsg) services.messages.cantDo.push('Did not report comment yet.')
+
+    }
+
+    services.not.alreadyReportedComment = function() {
+
+      if (!services.alreadyReportedComment(1)) return true;
+
+      services.messages.cantDo.push('Already reported comment.')
+    };
+
     services.alreadyVotedYes = function(dontPushMsg) {
       if (services.registeredVote() === 'yes') return true;
       if (!dontPushMsg) services.messages.cantDo.push('Did not vote YES yet.')
@@ -372,10 +400,55 @@ var exporter = function(libs) {
 
     };
 
+    services.addIdToNewComment = function(){
+      services.newComment.id = new db.ObjectID();
+    };
+
     services.addNewCommentToQuestion = function() {
       services.question.comments.push(services.newComment);
       services.question.numberOfComments ++;
       services.addToSave('question');
+    };
+
+    services.removeCommentFromQuestion = function() {
+      var i = services.question.comments.length;
+      while(i--){
+        if(services.question.comments[i].id == services.commentId) {
+          services.question.comments.splice(i,1);
+          services.messages.success.push('Comment removed.');
+          services.question.numberOfComments --;
+          services.addToSave('question');
+        }
+      }
+      
+    };
+
+    services.filterOutCommentsIReported = function() {
+      var i = services.question.comments.length;
+      while (i--){
+        var shouldRemove = false;
+        var j = services.question.comments[i].reportedBy.length;
+        while(j--){
+          if(services.question.comments[i].reportedBy[j] == services.clientMongoId) shouldRemove = true;
+        };
+        if(shouldRemove) services.question.comments.splice(i,1);
+      };
+    };
+
+    services.reportCommentOnQuestion = function() {
+      var i = services.question.comments.length;
+      while(i--){
+        if(services.question.comments[i].id == services.commentId) {
+          
+          var thisComment = services.question.comments[i];
+
+          thisComment.reportedBy.push(services.clientMongoId);
+
+          services.messages.success.push('Comment reported.');
+          services.addToSave('question');
+        };
+      };
+      
     };
 
     services.registerUpPromotion = function() {
@@ -469,6 +542,13 @@ var exporter = function(libs) {
       }
 
     };
+
+    // services.addIdToNewQuestion = function(id){
+
+    //   if(!id) id = new db.ObjectID();
+
+
+    // };
 
     services.postNewQuestion = function() {
       services.question = new classes.Question ({

@@ -396,7 +396,139 @@ var rules = {
 
       whatToDo: function(services) {
 
+        services.addIdToNewComment();
         services.addNewCommentToQuestion();
+
+      },
+
+      successPostFlightAsync: function(services) {
+        return [
+          services.saveData()
+        ]
+      },
+
+      successResponseBuilder: function(services) {
+        return {
+          toast: undefined,//services.getSuccessMessagesStr(),
+          data: undefined
+        };
+      },
+
+      cantDoResponseBuilder: function(services) {
+        return {
+          toast: services.getCantDoMessagesStr(),
+          data: undefined
+        };
+      }
+
+    },
+
+    deleteComment: {
+
+      name: {
+        type: 'userActions',
+        action: 'deleteComment'
+      },
+
+      minUserLevel: 0, 
+
+      credit: {
+
+        cost: 0,
+        earn: 0,
+        minNeeded: 0
+
+      },
+
+      serviceBuilder: function(req) {
+        return {
+          commentId: req.params.commentId,
+          questionId: req.params.questionId
+        };
+      },
+
+      loaderAsync: function(services) {
+        return [
+          services.loadQuestion()
+        ];
+      },
+
+      canIDo: function(services) {
+
+        return true;//services.not.questionHeaderExists() //services.hasEnoughCredit() && services.hasEnoughUserLevel()
+
+      },
+
+      whatToDo: function(services) {
+
+        services.removeCommentFromQuestion();
+
+      },
+
+      successPostFlightAsync: function(services) {
+        return [
+          services.saveData()
+        ]
+      },
+
+      successResponseBuilder: function(services) {
+        return {
+          toast: undefined,//services.getSuccessMessagesStr(),
+          data: undefined
+        };
+      },
+
+      cantDoResponseBuilder: function(services) {
+        return {
+          toast: services.getCantDoMessagesStr(),
+          data: undefined
+        };
+      }
+
+    },
+
+
+    reportComment: {
+
+      name: {
+        type: 'userActions',
+        action: 'reportComment'
+      },
+
+      minUserLevel: 0, 
+
+      credit: {
+
+        cost: 0,
+        earn: 0,
+        minNeeded: 0
+
+      },
+
+      serviceBuilder: function(req) {
+        return {
+          commentId: req.params.commentId,
+          questionId: req.params.questionId
+        };
+      },
+
+      loaderAsync: function(services) {
+        return [
+          services.loadQuestion()
+        ];
+      },
+
+      canIDo: function(services) {
+
+
+
+        return services.not.alreadyReportedComment()  ;//true;//services.not.questionHeaderExists() //services.hasEnoughCredit() && services.hasEnoughUserLevel()
+
+      },
+
+      whatToDo: function(services) {
+
+        services.reportCommentOnQuestion();
 
       },
 
@@ -675,6 +807,7 @@ var rules = {
       whatToDo: function(services) {
         services.addMyPreviousVoteToQuestionInParam(services.question);
         services.addMyPreviousPromotionToQuestionInParam(services.question);
+        services.filterOutCommentsIReported();
       },
 
       successPostFlightAsync: function(services) {
