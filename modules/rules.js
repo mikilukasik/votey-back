@@ -52,7 +52,7 @@ var rules = {
 
       serviceBuilder: function(req) {
         return {
-          questionId: req.body.questionId
+          questionId: req.params.questionId
         }
       },
 
@@ -82,7 +82,7 @@ var rules = {
 
       successResponseBuilder: function(services) {
         return {
-          toast: 'happened',//undefined,//undefined,//services.getSuccessMessagesStr(),
+          toast: undefined,//undefined,//services.getSuccessMessagesStr(),
           data: undefined
         };
       },
@@ -115,7 +115,7 @@ var rules = {
 
       serviceBuilder: function(req) {
         return {
-          questionId: req.body.questionId
+          questionId: req.params.questionId
         }
       },
 
@@ -127,7 +127,7 @@ var rules = {
 
       canIDo: function(services) {
 
-        return true;//services.not.alreadyApprovedThisQuestion && services.not.alreadyDisapprovedThisQuestion;
+        return services.not.alreadyApprovedThisQuestion && services.not.alreadyDisapprovedThisQuestion;
 
       },
 
@@ -145,7 +145,7 @@ var rules = {
 
       successResponseBuilder: function(services) {
         return {
-          toast: 'happened',//undefined,//undefined,//services.getSuccessMessagesStr(),
+          toast: undefined,//undefined,//services.getSuccessMessagesStr(),
           data: undefined
         };
       },
