@@ -82,7 +82,7 @@ var rules = {
 
       successResponseBuilder: function(services) {
         return {
-          toast: undefined,//undefined,//services.getSuccessMessagesStr(),
+          toast: 'happened',//undefined,//undefined,//services.getSuccessMessagesStr(),
           data: undefined
         };
       },
@@ -145,7 +145,7 @@ var rules = {
 
       successResponseBuilder: function(services) {
         return {
-          toast: undefined,//undefined,//services.getSuccessMessagesStr(),
+          toast: 'happened',//undefined,//undefined,//services.getSuccessMessagesStr(),
           data: undefined
         };
       },
