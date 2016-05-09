@@ -114,6 +114,42 @@ var initRouter = function(router, app) {
       });
     });
 
+  router.route('/questions/:questionID/approve') 
+    .put(function(req, res) {
+      seneca.act({
+        role: 'general',
+        cmd: 'dealWithUserAction',
+        req: req,
+        res: res,
+        desiredAction: 'approveQuestion'
+      }, function(err, resJson) {
+        if (err) res.status(500).json({
+          error: 'seneca ERROR in router',
+          details: err,
+          req: req.params
+        });
+        res.json(resJson);
+      });
+    });
+
+  router.route('/questions/:questionID/disapprove') 
+    .put(function(req, res) {
+      seneca.act({
+        role: 'general',
+        cmd: 'dealWithUserAction',
+        req: req,
+        res: res,
+        desiredAction: 'disapproveQuestion'
+      }, function(err, resJson) {
+        if (err) res.status(500).json({
+          error: 'seneca ERROR in router',
+          details: err,
+          req: req.params
+        });
+        res.json(resJson);
+      });
+    });
+
   //////////////  questions     /////////////////////
 
   router.route('/questions')
@@ -363,7 +399,7 @@ var initRouter = function(router, app) {
             });
           })
         } else {
-            //known client
+          //known client
           res.json({
             clientMongoId: myRecord._id
           })
@@ -392,7 +428,7 @@ var initRouter = function(router, app) {
         res.status(404).send('Unknown clientMongoId, please send hardWareId');
 
       } else {
-          //known client
+        //known client
         res.json({
           clientMongoId: myRecord._id
         })

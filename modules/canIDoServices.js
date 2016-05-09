@@ -38,14 +38,14 @@ var exporter = function(libs) {
       if (services.whatToSave.indexOf(toSaveStr) < 0) services.whatToSave.push(toSaveStr);
     };
 
-    services.canIDo = function(optionalUserAction) {  //sync
+    services.canIDo = function(optionalUserAction) { //sync
 
       var userAction = (optionalUserAction) ? optionalUserAction : services.desiredAction;
 
       return rules.userActions[userAction].canIDo(services);
     };
 
-    services.doIt = function(optionalUserAction) {  //sync
+    services.doIt = function(optionalUserAction) { //sync
 
       var userAction = (optionalUserAction) ? optionalUserAction : services.desiredAction;
 
@@ -54,7 +54,9 @@ var exporter = function(libs) {
     };
     services.loadQuestionList = function(query) { //async              
       return new Promise(function(resolve, reject) {
-        db.query('questions', query, { comments: 0 }).then(function(questionList) {
+        db.query('questions', query, {
+          comments: 0
+        }).then(function(questionList) {
           services.questionList = questionList;
           return resolve(services.questionList);
         }, function(err) {
@@ -74,22 +76,21 @@ var exporter = function(libs) {
       });
     };
 
-
-    services.shortenQuestionBodiesInList = function(){
-      services.questionList.forEach(function(question){
-        if(question.body.length > rules.shortenedQuestionBodyLength) question.body = question.body.substring(0,rules.shortenedQuestionBodyLength) + '...';
+    services.shortenQuestionBodiesInList = function() {
+      services.questionList.forEach(function(question) {
+        if (question.body.length > rules.shortenedQuestionBodyLength) question.body = question.body.substring(0, rules.shortenedQuestionBodyLength) + '...';
       });
     };
 
-    services.getMyQuestionList = function() {   //TODO: set order, filter, add myVotes
+    services.getMyQuestionList = function() { //TODO: set order, filter, add myVotes
       return services.questionList;
     };
 
-    services.getMyQuestion = function() {   //TODO: add myVotes
+    services.getMyQuestion = function() { //TODO: add myVotes
       return services.question;
     };
 
-    services.loadQuestion = function() {      
+    services.loadQuestion = function() {
       return new Promise(function(resolve, reject) {
         db.findOne('questions', {
           _id: new db.ObjectID(services.questionId)
@@ -114,7 +115,7 @@ var exporter = function(libs) {
       });
     };
 
-    services.loadData = function() {    //using rules
+    services.loadData = function() { //using rules
 
       return Promise.all(rules.userActions[services.desiredAction].loaderAsync(services)).then(function() {
         return services;
@@ -122,7 +123,7 @@ var exporter = function(libs) {
 
     };
 
-    services.doSuccessPostFlightAsync = function() {    //using rules
+    services.doSuccessPostFlightAsync = function() { //using rules
 
       return Promise.all(rules.userActions[services.desiredAction].successPostFlightAsync(services)).then(function() {
         return services;
@@ -178,15 +179,17 @@ var exporter = function(libs) {
       var userAction = (optionalUserAction) ? optionalUserAction : services.desiredAction;
 
       services.doIt(userAction);
-      return new Promise(function(res,rej){res()})
+      return new Promise(function(res, rej) {
+        res()
+      })
 
     };
 
-    services.moveVotedQuestionsToEndOfList = function(){
+    services.moveVotedQuestionsToEndOfList = function() {
       var touched = [];
       var untouched = [];
-      services.questionList.forEach(function(question){
-        if(question.previousVote){
+      services.questionList.forEach(function(question) {
+        if (question.previousVote) {
           touched.push(question);
         } else {
           untouched.push(question);
@@ -195,11 +198,11 @@ var exporter = function(libs) {
       });
     };
 
-    services.movePromotedQuestionsToEndOfList = function(){
+    services.movePromotedQuestionsToEndOfList = function() {
       var touched = [];
       var untouched = [];
-      services.questionList.forEach(function(question){
-        if(question.previousPromotion){
+      services.questionList.forEach(function(question) {
+        if (question.previousPromotion) {
           touched.push(question);
         } else {
           untouched.push(question);
@@ -209,61 +212,59 @@ var exporter = function(libs) {
     };
 
     services.sortQuestionsByNumberOfVotes = function() {
-      services.questionList.sort(function(a,b){
-        if(a.voteUp + a.voteDown > b.voteUp + b.voteDown){
-          return -1;
-        }else{
-          if(a.voteUp + a.voteDown < b.voteUp + b.voteDown){
-            return 1;
-          }else{
-            return 0;
+        services.questionList.sort(function(a, b) {
+          if (a.voteUp + a.voteDown > b.voteUp + b.voteDown) {
+            return -1;
+          } else {
+            if (a.voteUp + a.voteDown < b.voteUp + b.voteDown) {
+              return 1;
+            } else {
+              return 0;
+            }
           }
-        }
-      })
-    },
+        })
+      },
 
-    services.sortQuestionsByNumberOfPromotions = function() {
-      services.questionList.sort(function(a,b){
-        if(a.promoteUp + a.promoteDown > b.promoteUp + b.promoteDown){
-          return -1;
-        }else{
-          if(a.promoteUp + a.promoteDown < b.promoteUp + b.promoteDown){
-            return 1;
-          }else{
-            return 0;
+      services.sortQuestionsByNumberOfPromotions = function() {
+        services.questionList.sort(function(a, b) {
+          if (a.promoteUp + a.promoteDown > b.promoteUp + b.promoteDown) {
+            return -1;
+          } else {
+            if (a.promoteUp + a.promoteDown < b.promoteUp + b.promoteDown) {
+              return 1;
+            } else {
+              return 0;
+            }
           }
-        }
-      })
-    },
+        })
+      },
 
-    services.sortQuestionsByNumberOfReports = function() {
-      services.questionList.sort(function(a,b){
-        if(a.reportedBy.length > b.reportedBy.length){
-          return -1;
-        }else{
-          if(a.reportedBy.length < b.reportedBy.length){
-            return 1;
-          }else{
-            return 0;
+      services.sortQuestionsByNumberOfReports = function() {
+        services.questionList.sort(function(a, b) {
+          if (a.reportedBy.length > b.reportedBy.length) {
+            return -1;
+          } else {
+            if (a.reportedBy.length < b.reportedBy.length) {
+              return 1;
+            } else {
+              return 0;
+            }
           }
-        }
-      })
-    },
+        })
+      },
 
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    services.createRegisteredVoteObject = function(value) {
-      services.storedRegisteredVoteObject = {
-        questionId: services.questionId,
-        voting: value
+      services.createRegisteredVoteObject = function(value) {
+        services.storedRegisteredVoteObject = {
+          questionId: services.questionId,
+          voting: value
+        };
+        services.client.votes.push(services.storedRegisteredVoteObject);
+        services.addToSave('client');
       };
-      services.client.votes.push(services.storedRegisteredVoteObject);
-      services.addToSave('client');
-    };
 
-    services.getRegisteredVoteObject = function(createIfDoesntExist,createWithValue) {
+    services.getRegisteredVoteObject = function(createIfDoesntExist, createWithValue) {
 
       if (!services.storedRegisteredVoteObject) services.storedRegisteredVoteObject = _.find(services.client.votes, function(vote) {
         return vote.questionId === services.questionId
@@ -329,14 +330,51 @@ var exporter = function(libs) {
       services.messages.cantDo.push('Question is votable.')
     };
 
-    services.alreadyReportedQuestion = function(dontPushMsg){
-      
-          
-          var j = services.question.reportedBy.length;
+    services.alreadyApprovedQuestion = function(dontPushMsg) {
 
-          while(j--){
-            if(services.question.reportedBy[j] == services.clientMongoId) return true;
-          }
+      var j = services.question.approvedBy.length;
+
+      while (j--) {
+        if (services.question.approvedBy[j] == services.clientMongoId) return true;
+      }
+
+      if (!dontPushMsg) services.messages.cantDo.push('Did not approve question yet.')
+
+    };
+
+    services.not.alreadyApprovedQuestion = function() {
+
+      if (!services.alreadyApprovedQuestion(1)) return true;
+
+      services.messages.cantDo.push('Already approved question.')
+    };
+
+    services.alreadyDisapprovedQuestion = function(dontPushMsg) {
+
+      var j = services.question.disapprovedBy.length;
+
+      while (j--) {
+        if (services.question.disapprovedBy[j] == services.clientMongoId) return true;
+      }
+
+      if (!dontPushMsg) services.messages.cantDo.push('Did not disapprove question yet.')
+
+    };
+
+    services.not.alreadyDisapprovedQuestion = function() {
+
+      if (!services.alreadyDisapprovedQuestion(1)) return true;
+
+      services.messages.cantDo.push('Already disapproved question.')
+    };
+
+    services.alreadyReportedQuestion = function(dontPushMsg) {
+
+      var j = services.question.reportedBy.length;
+
+      while (j--) {
+        if (services.question.reportedBy[j] == services.clientMongoId) return true;
+      }
 
       if (!dontPushMsg) services.messages.cantDo.push('Did not report question yet.')
 
@@ -349,20 +387,17 @@ var exporter = function(libs) {
       services.messages.cantDo.push('Already reported question.')
     };
 
-    services.alreadyReportedComment = function(dontPushMsg){
+    services.alreadyReportedComment = function(dontPushMsg) {
       var i = services.question.comments.length;
-      while(i--){
-        if(services.question.comments[i].id == services.commentId) {
-          
+      while (i--) {
+        if (services.question.comments[i].id == services.commentId) {
+
           var j = services.question.comments[i].reportedBy.length;
 
-          while(j--){
-            if(services.question.comments[i].reportedBy[j] == services.clientMongoId) return true;
+          while (j--) {
+            if (services.question.comments[i].reportedBy[j] == services.clientMongoId) return true;
           }
 
-
-          
-          
         }
       }
 
@@ -444,49 +479,50 @@ var exporter = function(libs) {
 
     };
 
-    services.addIdToNewComment = function(){
+    services.addIdToNewComment = function() {
       services.newComment.id = new db.ObjectID();
     };
 
     services.addNewCommentToQuestion = function() {
       services.question.comments.push(services.newComment);
-      services.question.numberOfComments ++;
+      services.question.numberOfComments++;
       services.addToSave('question');
     };
 
     services.removeCommentFromQuestion = function() {
       var i = services.question.comments.length;
-      while(i--){
-        if(services.question.comments[i].id == services.commentId) {
-          services.question.comments.splice(i,1);
+      while (i--) {
+        if (services.question.comments[i].id == services.commentId) {
+          services.question.comments.splice(i, 1);
           services.messages.success.push('Comment removed.');
-          services.question.numberOfComments --;
+          services.question.numberOfComments--;
           services.addToSave('question');
         }
       }
-      
+
     };
     services.filterOutQuestionsIReported = function() {
-      
-        
-        var j = services.questionList.length;
-        while(j--){
-          if(_.some(services.questionList[j].reportedBy,function(thisReporter){ return thisReporter == services.clientMongoId })) {
-            services.questionList.splice(j,1);
-          }
-        };
-        
+
+      var j = services.questionList.length;
+      while (j--) {
+        if (_.some(services.questionList[j].reportedBy, function(thisReporter) {
+            return thisReporter == services.clientMongoId
+          })) {
+          services.questionList.splice(j, 1);
+        }
+      };
+
     };
 
-    services.buildReportedCommentsList = function(){
+    services.buildReportedCommentsList = function() {
 
       services.reportedCommentsList = [];
       var i = services.questionList.length;
-      while(i--){
+      while (i--) {
         var j = services.questionList[i].comments.length;
-        while(j--){
+        while (j--) {
 
-          if(services.questionList[i].comments[j].reportedBy.length > 0){
+          if (services.questionList[i].comments[j].reportedBy.length > 0) {
 
             services.reportedCommentsList.push(services.questionList[i].comments[j]);
 
@@ -495,14 +531,14 @@ var exporter = function(libs) {
       };
     };
 
-    services.sortReportedCommentsListByNumberOfReports = function(){
-      services.reportedCommentsList.sort(function(a,b){
-        if(a.reportedBy.length > b.reportedBy.length){
+    services.sortReportedCommentsListByNumberOfReports = function() {
+      services.reportedCommentsList.sort(function(a, b) {
+        if (a.reportedBy.length > b.reportedBy.length) {
           return -1;
-        }else{
-          if(a.reportedBy.length < b.reportedBy.length){
+        } else {
+          if (a.reportedBy.length < b.reportedBy.length) {
             return 1;
-          }else{
+          } else {
             return 0;
           }
         }
@@ -511,21 +547,21 @@ var exporter = function(libs) {
 
     services.filterOutCommentsIReported = function() {
       var i = services.question.comments.length;
-      while (i--){
+      while (i--) {
         var shouldRemove = false;
         var j = services.question.comments[i].reportedBy.length;
-        while(j--){
-          if(services.question.comments[i].reportedBy[j] == services.clientMongoId) shouldRemove = true;
+        while (j--) {
+          if (services.question.comments[i].reportedBy[j] == services.clientMongoId) shouldRemove = true;
         };
-        if(shouldRemove) services.question.comments.splice(i,1);
+        if (shouldRemove) services.question.comments.splice(i, 1);
       };
     };
 
     services.reportCommentOnQuestion = function() {
       var i = services.question.comments.length;
-      while(i--){
-        if(services.question.comments[i].id == services.commentId) {
-          
+      while (i--) {
+        if (services.question.comments[i].id == services.commentId) {
+
           var thisComment = services.question.comments[i];
 
           thisComment.reportedBy.push(services.clientMongoId);
@@ -536,32 +572,50 @@ var exporter = function(libs) {
           services.addToSave('question');
         };
       };
-      
+
     };
 
     services.reportQuestion = function() {
-     
-          services.question.reportedBy.push(services.clientMongoId);
 
-          services.messages.success.push('Question reported.');
-          services.addToSave('question');
-       
-      
+      services.question.reportedBy.push(services.clientMongoId);
+
+      services.messages.success.push('Question reported.');
+      services.addToSave('question');
+
     };
+
+    services.approveQuestion = function() {
+
+      services.question.approvedBy.push(services.clientMongoId);
+
+      services.messages.success.push('Question approved.');
+      services.addToSave('question');
+
+    };
+
+    services.disapproveQuestion = function() {
+
+      services.question.disapprovedBy.push(services.clientMongoId);
+
+      services.messages.success.push('Question disapproved.');
+      services.addToSave('question');
+
+    };
+
+
 
     services.updateCommentOnQuestion = function() {
       var i = services.question.comments.length;
-      while(i--){
-        if(services.question.comments[i].id == services.commentId) {
-          
+      while (i--) {
+        if (services.question.comments[i].id == services.commentId) {
+
           services.question.comments[i] = services.comment;
 
-          
           services.messages.success.push('Comment updated.');
           services.addToSave('question');
         };
       };
-      
+
     };
 
     services.registerUpPromotion = function() {
@@ -660,42 +714,41 @@ var exporter = function(libs) {
 
     //   if(!id) id = new db.ObjectID();
 
-
     // };
 
     services.postNewQuestion = function() {
-      services.question = new classes.Question ({
-        header: services.newQuestion.header,
-        body: services.newQuestion.body,
-        postedBy: services.clientMongoId
-      }),
-      services.addToSave('question');
+      services.question = new classes.Question({
+          header: services.newQuestion.header,
+          body: services.newQuestion.body,
+          postedBy: services.clientMongoId
+        }),
+        services.addToSave('question');
       services.messages.success.push('Question added.')
     };
 
-    services.addMyPreviousVoteToQuestionInParam = function(question){
-      var myPreviousVoteForThisQuestion = _.find(services.client.votes,function(previousVote){
+    services.addMyPreviousVoteToQuestionInParam = function(question) {
+      var myPreviousVoteForThisQuestion = _.find(services.client.votes, function(previousVote) {
         return previousVote.questionId == question._id
       });
       if (myPreviousVoteForThisQuestion) question.previousVote = (myPreviousVoteForThisQuestion.voting) ? 'yes' : 'no';
 
     };
 
-    services.addMyPreviousPromotionToQuestionInParam = function(question){
-      var myPreviousPromotionForThisQuestion = _.find(services.client.promotions,function(previousPromotion){
+    services.addMyPreviousPromotionToQuestionInParam = function(question) {
+      var myPreviousPromotionForThisQuestion = _.find(services.client.promotions, function(previousPromotion) {
         return previousPromotion.questionId == question._id
       });
       if (myPreviousPromotionForThisQuestion) question.previousPromotion = (myPreviousPromotionForThisQuestion.promoting) ? 'up' : 'down';
     };
 
     services.addMyVotesToQuestionList = function() {
-      services.questionList.forEach(function(question){
+      services.questionList.forEach(function(question) {
         services.addMyPreviousVoteToQuestionInParam(question);
       })
     };
 
     services.addMyPromotionsToQuestionList = function() {
-      services.questionList.forEach(function(question){
+      services.questionList.forEach(function(question) {
         services.addMyPreviousPromotionToQuestionInParam(question);
       })
     };
@@ -765,9 +818,8 @@ var exporter = function(libs) {
 
     var keysToAdd = rules.userActions[params.desiredAction].serviceBuilder(params.req);
     for (var key in keysToAdd) newServices[key] = keysToAdd[key]
-    
 
-    return newServices.loadData();  //promise
+    return newServices.loadData(); //promise
 
   };
 

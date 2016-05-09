@@ -33,6 +33,134 @@ var rules = {
 
   userActions: {
 
+    approveQuestion: {
+
+      name: {
+        type: 'userActions',
+        action: 'approveQuestion'
+      },
+
+      minUserLevel: 0,
+
+      credit: {
+
+        cost: 0,
+        earn: 5,
+        minNeeded: 10
+
+      },
+
+      serviceBuilder: function(req) {
+        return {
+          questionId: req.body.questionId
+        }
+      },
+
+      loaderAsync: function(services) {
+        return [
+          services.loadQuestion()
+        ]
+      },
+
+      canIDo: function(services) {
+
+        return services.not.alreadyApprovedThisQuestion && services.not.alreadyDisapprovedThisQuestion;
+
+      },
+
+      whatToDo: function(services) {
+
+        services.approveQuestion();
+
+      },
+
+      successPostFlightAsync: function(services) {
+        return [
+          services.saveData()
+        ]
+      },
+
+      successResponseBuilder: function(services) {
+        return {
+          toast: undefined,//undefined,//services.getSuccessMessagesStr(),
+          data: undefined
+        };
+      },
+
+      cantDoResponseBuilder: function(services) {
+        return {
+          toast: services.getCantDoMessagesStr(),
+          data: undefined
+        };
+      }
+
+    },
+
+    disapproveQuestion: {
+
+      name: {
+        type: 'userActions',
+        action: 'disapproveQuestion'
+      },
+
+      minUserLevel: 0,
+
+      credit: {
+
+        cost: 0,
+        earn: 5,
+        minNeeded: 10
+
+      },
+
+      serviceBuilder: function(req) {
+        return {
+          questionId: req.body.questionId
+        }
+      },
+
+      loaderAsync: function(services) {
+        return [
+          services.loadQuestion()
+        ]
+      },
+
+      canIDo: function(services) {
+
+        return services.not.alreadyApprovedThisQuestion && services.not.alreadyDisapprovedThisQuestion;
+
+      },
+
+      whatToDo: function(services) {
+
+        services.disapproveQuestion();
+
+      },
+
+      successPostFlightAsync: function(services) {
+        return [
+          services.saveData()
+        ]
+      },
+
+      successResponseBuilder: function(services) {
+        return {
+          toast: undefined,//undefined,//services.getSuccessMessagesStr(),
+          data: undefined
+        };
+      },
+
+      cantDoResponseBuilder: function(services) {
+        return {
+          toast: services.getCantDoMessagesStr(),
+          data: undefined
+        };
+      }
+
+    },
+
+
+
     voteYes: {
 
       name: {
