@@ -330,7 +330,7 @@ var exporter = function(libs) {
       services.messages.cantDo.push('Question is votable.')
     };
 
-    services.alreadyApprovedQuestion = function(dontPushMsg) {
+    services.alreadyApprovedThisQuestion = function(dontPushMsg) {
 
       var j = services.question.approvedBy.length;
 
@@ -342,14 +342,14 @@ var exporter = function(libs) {
 
     };
 
-    services.not.alreadyApprovedQuestion = function() {
+    services.not.alreadyApprovedThisQuestion = function() {
 
-      if (!services.alreadyApprovedQuestion(1)) return true;
+      if (!services.alreadyApprovedThisQuestion(1)) return true;
 
       services.messages.cantDo.push('Already approved question.')
     };
 
-    services.alreadyDisapprovedQuestion = function(dontPushMsg) {
+    services.alreadyDisapprovedThisQuestion = function(dontPushMsg) {
 
       var j = services.question.disapprovedBy.length;
 
@@ -361,9 +361,9 @@ var exporter = function(libs) {
 
     };
 
-    services.not.alreadyDisapprovedQuestion = function() {
+    services.not.alreadyDisapprovedThisQuestion = function() {
 
-      if (!services.alreadyDisapprovedQuestion(1)) return true;
+      if (!services.alreadyDisapprovedThisQuestion(1)) return true;
 
       services.messages.cantDo.push('Already disapproved question.')
     };
