@@ -10,30 +10,32 @@ var initRouter = function(router, app) {
   app.use('/api', router);
 
   router.route('/clearDb') //register
-    .post(function(req, res) 
-    {
-      console.log('ClearDb received')
+    .post(function(req, res) {
 
-      Promise.all([db.dropCollection('clients'),db.dropCollection('questions')]).then(function(){
-        res.json({ok:1});
-      },function(err){
+      Promise.all([db.dropCollection('clients'), db.dropCollection('questions')]).then(function() {
+        res.json({
+          ok: 1
+        });
+      }, function(err) {
         res.status(500).json(err);
       })
-      
+
     });
 
   ////////////////////////  login  ///////////////////////
 
   router.route('/login') //register
-    .post(function(req, res) 
-    {
-         console.log('cccccccccccccccccccc',req.get('clientMongoId'))
+    .post(function(req, res) {
       seneca.act({
         role: 'login',
         cmd: 'register',
         req: req
       }, function(err, resJson) {
-        if(err) res.status(500).json({ error: 'seneca ERROR in router', details: err, req: req.params });
+        if (err) res.status(500).json({
+          error: 'seneca ERROR in router',
+          details: err,
+          req: req.params
+        });
         res.json(resJson);
       });
     });
@@ -45,17 +47,17 @@ var initRouter = function(router, app) {
         cmd: 'login',
         req: req
       }, function(err, resJson) {
-        if(err) res.status(500).json({ error: 'seneca ERROR in router', details: err, req: req.params });
+        if (err) res.status(500).json({
+          error: 'seneca ERROR in router',
+          details: err,
+          req: req.params
+        });
         res.json(resJson);
       });
 
     });
 
-
   ///////////////////// vote and promote //////////////////////
-
-
-
 
   router.route('/promotions')
     .post(function(req, res) {
@@ -66,7 +68,11 @@ var initRouter = function(router, app) {
         res: res,
         desiredAction: (req.body.promoting) ? 'promoteUp' : 'promoteDown'
       }, function(err, resJson) {
-        if(err) res.status(500).json({ error: 'seneca ERROR in router', details: err, req: req.params });
+        if (err) res.status(500).json({
+          error: 'seneca ERROR in router',
+          details: err,
+          req: req.params
+        });
         res.json(resJson);
       });
 
@@ -81,7 +87,11 @@ var initRouter = function(router, app) {
         res: res,
         desiredAction: (req.body.voting) ? 'voteYes' : 'voteNo'
       }, function(err, resJson) {
-        if(err) res.status(500).json({ error: 'seneca ERROR in router', details: err, req: req.params });
+        if (err) res.status(500).json({
+          error: 'seneca ERROR in router',
+          details: err,
+          req: req.params
+        });
         res.json(resJson);
       });
     });
@@ -95,11 +105,14 @@ var initRouter = function(router, app) {
         res: res,
         desiredAction: 'forceEscalateQuestion'
       }, function(err, resJson) {
-        if(err) res.status(500).json({ error: 'seneca ERROR in router', details: err, req: req.params });
+        if (err) res.status(500).json({
+          error: 'seneca ERROR in router',
+          details: err,
+          req: req.params
+        });
         res.json(resJson);
       });
     });
-
 
   //////////////  questions     /////////////////////
 
@@ -112,7 +125,11 @@ var initRouter = function(router, app) {
         res: res,
         desiredAction: 'postNewQuestion'
       }, function(err, resJson) {
-        if(err) res.status(500).json({ error: 'seneca ERROR in router', details: err, req: req.params });
+        if (err) res.status(500).json({
+          error: 'seneca ERROR in router',
+          details: err,
+          req: req.params
+        });
         res.json(resJson);
       });
     });
@@ -126,7 +143,11 @@ var initRouter = function(router, app) {
         res: res,
         desiredAction: 'postNewComment'
       }, function(err, resJson) {
-        if(err) res.status(500).json({ error: 'seneca ERROR in router', details: err, req: req.params });
+        if (err) res.status(500).json({
+          error: 'seneca ERROR in router',
+          details: err,
+          req: req.params
+        });
         res.json(resJson);
       });
     });
@@ -140,7 +161,11 @@ var initRouter = function(router, app) {
         res: res,
         desiredAction: 'deleteComment'
       }, function(err, resJson) {
-        if(err) res.status(500).json({ error: 'seneca ERROR in router', details: err, req: req.params });
+        if (err) res.status(500).json({
+          error: 'seneca ERROR in router',
+          details: err,
+          req: req.params
+        });
         res.json(resJson);
       });
     });
@@ -154,7 +179,11 @@ var initRouter = function(router, app) {
         res: res,
         desiredAction: 'updateComment'
       }, function(err, resJson) {
-        if(err) res.status(500).json({ error: 'seneca ERROR in router', details: err, req: req.params });
+        if (err) res.status(500).json({
+          error: 'seneca ERROR in router',
+          details: err,
+          req: req.params
+        });
         res.json(resJson);
       });
     });
@@ -168,7 +197,11 @@ var initRouter = function(router, app) {
         res: res,
         desiredAction: 'reportComment'
       }, function(err, resJson) {
-        if(err) res.status(500).json({ error: 'seneca ERROR in router', details: err, req: req.params });
+        if (err) res.status(500).json({
+          error: 'seneca ERROR in router',
+          details: err,
+          req: req.params
+        });
         res.json(resJson);
       });
     });
@@ -182,11 +215,14 @@ var initRouter = function(router, app) {
         res: res,
         desiredAction: 'reportQuestion'
       }, function(err, resJson) {
-        if(err) res.status(500).json({ error: 'seneca ERROR in router', details: err, req: req.params });
+        if (err) res.status(500).json({
+          error: 'seneca ERROR in router',
+          details: err,
+          req: req.params
+        });
         res.json(resJson);
       });
     });
-
 
   router.route('/questions/votables')
     .get(function(req, res) {
@@ -197,7 +233,11 @@ var initRouter = function(router, app) {
         res: res,
         desiredAction: 'getVotableQuestions'
       }, function(err, resJson) {
-        if(err) res.status(500).json({ error: 'seneca ERROR in router', details: err, req: req.params });
+        if (err) res.status(500).json({
+          error: 'seneca ERROR in router',
+          details: err,
+          req: req.params
+        });
         res.json(resJson);
       });
     });
@@ -211,11 +251,15 @@ var initRouter = function(router, app) {
         res: res,
         desiredAction: 'getQuestionsToReview'
       }, function(err, resJson) {
-        if(err) res.status(500).json({ error: 'seneca ERROR in router', details: err, req: req.params });
+        if (err) res.status(500).json({
+          error: 'seneca ERROR in router',
+          details: err,
+          req: req.params
+        });
         res.json(resJson);
       });
     });
-    
+
   router.route('/comments/toReview')
     .get(function(req, res) {
       seneca.act({
@@ -225,10 +269,14 @@ var initRouter = function(router, app) {
         res: res,
         desiredAction: 'getCommentsToReview'
       }, function(err, resJson) {
-        if(err) res.status(500).json({ error: 'seneca ERROR in router', details: err, req: req.params });
+        if (err) res.status(500).json({
+          error: 'seneca ERROR in router',
+          details: err,
+          req: req.params
+        });
         res.json(resJson);
       });
-    });    
+    });
 
   router.route('/questions/promotables')
     .get(function(req, res) {
@@ -239,7 +287,11 @@ var initRouter = function(router, app) {
         res: res,
         desiredAction: 'getPromotableQuestions'
       }, function(err, resJson) {
-        if(err) res.status(500).json({ error: 'seneca ERROR in router', details: err, req: req.params });
+        if (err) res.status(500).json({
+          error: 'seneca ERROR in router',
+          details: err,
+          req: req.params
+        });
         res.json(resJson);
       });
     });
@@ -253,26 +305,26 @@ var initRouter = function(router, app) {
         res: res,
         desiredAction: 'getQuestion'
       }, function(err, resJson) {
-        if(err) res.status(500).json({ error: 'seneca ERROR in router', details: err, req: req.params });
+        if (err) res.status(500).json({
+          error: 'seneca ERROR in router',
+          details: err,
+          req: req.params
+        });
         res.json(resJson);
       });
     });
 
-
-
   router.route('/check')
     .get(function(req, res) {
-      
-        res.send('OK');
-      
+
+      res.send('OK');
+
     });
 
   ////////////////////// id /////////////////////////
-  
+
   router.route('/client-mongo-id/:hardWareId')
     .get(function(req, res) {
-
-
 
       var hardWareId = req.params.hardWareId;
 
@@ -284,7 +336,6 @@ var initRouter = function(router, app) {
         hardWareId: hardWareId,
         username: false
       }).then(function(myRecord) {
-        console.log('recoooooooooo:',myRecord)
         if (!myRecord) {
 
           //new client
@@ -303,49 +354,58 @@ var initRouter = function(router, app) {
             res.json({
               clientMongoId: myNewRecord._id
             })
-          }, function(err){
-            console.log('route ERROR when saving to db, GET /client-mongo-id/:hardWareId',err);
-            res.status(500).json({ error: 'route ERROR, GET /client-mongo-id/' + hardWareId, details: err, req: req.params });
+          }, function(err) {
+            console.log('route ERROR when saving to db, GET /client-mongo-id/:hardWareId', err);
+            res.status(500).json({
+              error: 'route ERROR, GET /client-mongo-id/' + hardWareId,
+              details: err,
+              req: req.params
+            });
           })
         } else {
-          console.log('known client', myRecord)
             //known client
           res.json({
             clientMongoId: myRecord._id
           })
         }
-      },function(err){
-        console.log('route ERROR when reading from db, GET /client-mongo-id/:hardWareId',err);
-        res.status(500).json({ error: 'route ERROR, GET /client-mongo-id/' + hardWareId, details: err, req: req.params });
+      }, function(err) {
+        console.log('route ERROR when reading from db, GET /client-mongo-id/:hardWareId', err);
+        res.status(500).json({
+          error: 'route ERROR, GET /client-mongo-id/' + hardWareId,
+          details: err,
+          req: req.params
+        });
       })
     });
 
   router.route('/client-mongo-id/:clientMongoId')
 
-    .put(function(req, res) {
- 
-      var clientMongoId = req.body.clientMongoId;
-      console.log('clientMongoId in question: ',clientMongoId)
-      db.findOne('clients', {
-        _id: new db.ObjectID(clientMongoId)
-      }).then(function(myRecord) {
-        if (!myRecord) {
-          //send res error
+  .put(function(req, res) {
 
-          res.status(404).send('Unknown clientMongoId, please send hardWareId');
+    var clientMongoId = req.body.clientMongoId;
+    db.findOne('clients', {
+      _id: new db.ObjectID(clientMongoId)
+    }).then(function(myRecord) {
+      if (!myRecord) {
+        //send res error
 
-        } else {
-          console.log('known client checking in..', myRecord)
-            //known client
-          res.json({
-            clientMongoId: myRecord._id
-          })
-        }
-      },function(err){
-        console.log('route ERROR when reading from db, PUT /client-mongo-id/:clientMongoId',err);
-        res.status(500).json({ error: 'route ERROR, PUT /client-mongo-id/' + clientMongoId, details: err, req: req.params });
-      })
-    });
+        res.status(404).send('Unknown clientMongoId, please send hardWareId');
+
+      } else {
+          //known client
+        res.json({
+          clientMongoId: myRecord._id
+        })
+      }
+    }, function(err) {
+      console.log('route ERROR when reading from db, PUT /client-mongo-id/:clientMongoId', err);
+      res.status(500).json({
+        error: 'route ERROR, PUT /client-mongo-id/' + clientMongoId,
+        details: err,
+        req: req.params
+      });
+    })
+  });
 
   router.route('/client-mongo-id/:clientMongoId')
     .post(function(req, res) {
@@ -355,7 +415,7 @@ var initRouter = function(router, app) {
 
       db.findOne('clients', {
         _id: objId
-      }, function(myRecord) {     //update in cb and save after
+      }, function(myRecord) { //update in cb and save after
         if (!myRecord) {
           db.save('clients', {
             _id: objId,

@@ -77,7 +77,6 @@ var exporter = function(libs) {
 
     services.shortenQuestionBodiesInList = function(){
       services.questionList.forEach(function(question){
-        console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@',question)
         if(question.body.length > rules.shortenedQuestionBodyLength) question.body = question.body.substring(0,rules.shortenedQuestionBodyLength) + '...';
       });
     };
@@ -96,7 +95,6 @@ var exporter = function(libs) {
           _id: new db.ObjectID(services.questionId)
         }).then(function(questionDoc) {
           services.question = questionDoc;
-          console.log('q loaded', questionDoc)
           return resolve(questionDoc);
         }, function(err) {
           return reject(err)
