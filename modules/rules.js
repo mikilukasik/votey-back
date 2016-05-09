@@ -64,7 +64,7 @@ var rules = {
 
       canIDo: function(services) {
 
-        return services.not.alreadyApprovedThisQuestion && services.not.alreadyDisapprovedThisQuestion;
+        return services.not.alreadyApprovedThisQuestion() && services.not.alreadyDisapprovedThisQuestion();
 
       },
 
@@ -126,14 +126,13 @@ var rules = {
       },
 
       canIDo: function(services) {
-        
-        return services.not.alreadyApprovedThisQuestion && services.not.alreadyDisapprovedThisQuestion;
+
+        return services.not.alreadyApprovedThisQuestion() && services.not.alreadyDisapprovedThisQuestion();
 
       },
 
       whatToDo: function(services) {
 
-        services.res.json(services.question)
         services.disapproveQuestion();
 
       },
