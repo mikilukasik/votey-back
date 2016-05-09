@@ -115,7 +115,7 @@ var initRouter = function(router, app) {
     });
 
   router.route('/questions/:questionID/approve') 
-    .put(function(req, res) {
+    .post(function(req, res) {
       seneca.act({
         role: 'general',
         cmd: 'dealWithUserAction',
@@ -133,7 +133,7 @@ var initRouter = function(router, app) {
     });
 
   router.route('/questions/:questionID/disapprove') 
-    .put(function(req, res) {
+    .post(function(req, res) {
       seneca.act({
         role: 'general',
         cmd: 'dealWithUserAction',
