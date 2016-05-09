@@ -514,7 +514,7 @@ var exporter = function(libs) {
 
     };
 
-    services.removeQuestionsIDisapproved = function() {
+    services.removeQuestionsIApproved = function() {
 
       var j = services.questionList.length;
       while (j--) {
