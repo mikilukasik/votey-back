@@ -1009,6 +1009,9 @@ var rules = {
 
       whatToDo: function(services) {
         
+        services.removeQuestionsIApproved();
+        services.removeQuestionsIDisapproved();
+
         services.sortQuestionsByNumberOfReports();
         
       },

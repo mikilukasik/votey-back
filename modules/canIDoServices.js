@@ -514,6 +514,32 @@ var exporter = function(libs) {
 
     };
 
+    services.removeQuestionsIDisapproved = function() {
+
+      var j = services.questionList.length;
+      while (j--) {
+        if (_.some(services.questionList[j].approvedBy, function(thisUser) {
+            return thisUser == services.clientMongoId
+          })) {
+          services.questionList.splice(j, 1);
+        }
+      };
+
+    };
+
+    services.removeQuestionsIDisapproved = function() {
+
+      var j = services.questionList.length;
+      while (j--) {
+        if (_.some(services.questionList[j].disapprovedBy, function(thisUser) {
+            return thisUser == services.clientMongoId
+          })) {
+          services.questionList.splice(j, 1);
+        }
+      };
+
+    };
+
     services.buildReportedCommentsList = function() {
 
       services.reportedCommentsList = [];
