@@ -126,13 +126,14 @@ var rules = {
       },
 
       canIDo: function(services) {
-        services.res.json(services.question)
+        
         return services.not.alreadyApprovedThisQuestion && services.not.alreadyDisapprovedThisQuestion;
 
       },
 
       whatToDo: function(services) {
 
+        services.res.json(services.question)
         services.disapproveQuestion();
 
       },
