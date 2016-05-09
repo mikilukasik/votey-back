@@ -127,7 +127,7 @@ var rules = {
 
       canIDo: function(services) {
 
-        return services.not.alreadyApprovedThisQuestion && services.not.alreadyDisapprovedThisQuestion;
+        return true;//services.not.alreadyApprovedThisQuestion && services.not.alreadyDisapprovedThisQuestion;
 
       },
 
