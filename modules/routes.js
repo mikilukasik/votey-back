@@ -114,7 +114,7 @@ var initRouter = function(router, app) {
       });
     });
 
-  router.route('/questions/:questionID/approve') 
+  router.route('/questions/:questionId/approve') 
     .post(function(req, res) {
       seneca.act({
         role: 'general',
@@ -132,7 +132,7 @@ var initRouter = function(router, app) {
       });
     });
 
-  router.route('/questions/:questionID/disapprove') 
+  router.route('/questions/:questionId/disapprove') 
     .post(function(req, res) {
       seneca.act({
         role: 'general',
