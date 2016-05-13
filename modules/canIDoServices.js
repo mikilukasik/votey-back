@@ -405,6 +405,16 @@ var exporter = function(libs) {
 
     };
 
+    //TODO: write below functions
+
+    services.not.alreadyApprovedComment = function(){
+      return true;
+    };
+
+    services.not.alreadyDisapprovedComment = function(){
+      return true;
+    };
+
     services.not.alreadyReportedComment = function() {
 
       if (!services.alreadyReportedComment(1)) return true;

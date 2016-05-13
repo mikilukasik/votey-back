@@ -751,6 +751,139 @@ var rules = {
 
     },
 
+    approveComment: {
+
+      name: {
+        type: 'userActions',
+        action: 'approveComment'
+      },
+
+      minUserLevel: 0, 
+
+      credit: {
+
+        cost: 0,
+        earn: 0,
+        minNeeded: 0
+
+      },
+
+      serviceBuilder: function(req) {
+        return {
+          commentId: req.params.commentId,
+          questionId: req.params.questionId
+        };
+      },
+
+      loaderAsync: function(services) {
+        return [
+          services.loadQuestion()
+        ];
+      },
+
+      canIDo: function(services) {
+
+        return services.not.alreadyApprovedComment()  ;//true;//services.not.questionHeaderExists() //services.hasEnoughCredit() && services.hasEnoughUserLevel()
+
+      },
+
+      whatToDo: function(services) {
+
+        services.reportCommentOnQuestion();
+
+      },
+
+      successPostFlightAsync: function(services) {
+        return [
+          services.saveData()
+        ]
+      },
+
+      successResponseBuilder: function(services) {
+        return {
+          toast: undefined,//services.getSuccessMessagesStr(),
+          data: undefined
+        };
+      },
+
+      cantDoResponseBuilder: function(services) {
+        return {
+          toast: services.getCantDoMessagesStr(),
+          data: undefined
+        };
+      }
+
+    },
+
+    disapproveComment: {
+
+      name: {
+        type: 'userActions',
+        action: 'disapproveComment'
+      },
+
+      minUserLevel: 0, 
+
+      credit: {
+
+        cost: 0,
+        earn: 0,
+        minNeeded: 0
+
+      },
+
+      serviceBuilder: function(req) {
+        return {
+          commentId: req.params.commentId,
+          questionId: req.params.questionId
+        };
+      },
+
+      loaderAsync: function(services) {
+        return [
+          services.loadQuestion()
+        ];
+      },
+
+      canIDo: function(services) {
+        
+        return services.not.alreadyDisapprovedComment();//true;//services.not.questionHeaderExists() //services.hasEnoughCredit() && services.hasEnoughUserLevel()
+
+      },
+
+      whatToDo: function(services) {
+        console.log({
+          commentId: services.commentId,
+          questionId: services.questionId,
+          comment: services.comment,
+          question: services.question
+        })
+        services.reportCommentOnQuestion();
+
+      },
+
+      successPostFlightAsync: function(services) {
+        return [
+          services.saveData()
+        ]
+      },
+
+      successResponseBuilder: function(services) {
+        return {
+          toast: undefined,//services.getSuccessMessagesStr(),
+          data: undefined
+        };
+      },
+
+      cantDoResponseBuilder: function(services) {
+        return {
+          toast: services.getCantDoMessagesStr(),
+          data: undefined
+        };
+      }
+
+    },
+
     reportQuestion: {
 
       name: {

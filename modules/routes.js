@@ -26,11 +26,12 @@ var initRouter = function(router, app) {
 
   router.route('/login') //register
     .post(function(req, res) {
-      seneca.act({
+      dealWithUserAction({
         role: 'login',
         cmd: 'register',
         req: req
       }, function(err, resJson) {
+        console.log(err);
         if (err) res.status(500).json({
           error: 'seneca ERROR in router',
           details: err,
@@ -42,11 +43,12 @@ var initRouter = function(router, app) {
 
   router.route('/login') //login
     .put(function(req, res) {
-      seneca.act({
+      dealWithUserAction({
         role: 'login',
         cmd: 'login',
         req: req
       }, function(err, resJson) {
+        console.log(err);
         if (err) res.status(500).json({
           error: 'seneca ERROR in router',
           details: err,
@@ -61,13 +63,14 @@ var initRouter = function(router, app) {
 
   router.route('/promotions')
     .post(function(req, res) {
-      seneca.act({
+      dealWithUserAction({
         role: 'general',
         cmd: 'dealWithUserAction',
         req: req,
         res: res,
         desiredAction: (req.body.promoting) ? 'promoteUp' : 'promoteDown'
       }, function(err, resJson) {
+        console.log(err);
         if (err) res.status(500).json({
           error: 'seneca ERROR in router',
           details: err,
@@ -80,13 +83,14 @@ var initRouter = function(router, app) {
 
   router.route('/votes')
     .post(function(req, res) {
-      seneca.act({
+      dealWithUserAction({
         role: 'general',
         cmd: 'dealWithUserAction',
         req: req,
         res: res,
         desiredAction: (req.body.voting) ? 'voteYes' : 'voteNo'
       }, function(err, resJson) {
+        console.log(err);
         if (err) res.status(500).json({
           error: 'seneca ERROR in router',
           details: err,
@@ -98,13 +102,14 @@ var initRouter = function(router, app) {
 
   router.route('/questions/:questionID') //escalate
     .put(function(req, res) {
-      seneca.act({
+      dealWithUserAction({
         role: 'general',
         cmd: 'dealWithUserAction',
         req: req,
         res: res,
         desiredAction: 'forceEscalateQuestion'
       }, function(err, resJson) {
+        console.log(err);
         if (err) res.status(500).json({
           error: 'seneca ERROR in router',
           details: err,
@@ -116,13 +121,14 @@ var initRouter = function(router, app) {
 
   router.route('/questions/:questionId/approve') 
     .post(function(req, res) {
-      seneca.act({
+      dealWithUserAction({
         role: 'general',
         cmd: 'dealWithUserAction',
         req: req,
         res: res,
         desiredAction: 'approveQuestion'
       }, function(err, resJson) {
+        console.log(err);
         if (err) res.status(500).json({
           error: 'seneca ERROR in router',
           details: err,
@@ -134,13 +140,14 @@ var initRouter = function(router, app) {
 
   router.route('/questions/:questionId/disapprove') 
     .post(function(req, res) {
-      seneca.act({
+      dealWithUserAction({
         role: 'general',
         cmd: 'dealWithUserAction',
         req: req,
         res: res,
         desiredAction: 'disapproveQuestion'
       }, function(err, resJson) {
+        console.log(err);
         if (err) res.status(500).json({
           error: 'seneca ERROR in router',
           details: err,
@@ -154,13 +161,14 @@ var initRouter = function(router, app) {
 
   router.route('/questions')
     .post(function(req, res) {
-      seneca.act({
+      dealWithUserAction({
         role: 'general',
         cmd: 'dealWithUserAction',
         req: req,
         res: res,
         desiredAction: 'postNewQuestion'
       }, function(err, resJson) {
+        console.log(err);
         if (err) res.status(500).json({
           error: 'seneca ERROR in router',
           details: err,
@@ -172,13 +180,14 @@ var initRouter = function(router, app) {
 
   router.route('/questions/:questionId/comments')
     .post(function(req, res) {
-      seneca.act({
+      dealWithUserAction({
         role: 'general',
         cmd: 'dealWithUserAction',
         req: req,
         res: res,
         desiredAction: 'postNewComment'
       }, function(err, resJson) {
+        console.log(err);
         if (err) res.status(500).json({
           error: 'seneca ERROR in router',
           details: err,
@@ -190,13 +199,14 @@ var initRouter = function(router, app) {
 
   router.route('/questions/:questionId/comments/:commentId')
     .delete(function(req, res) {
-      seneca.act({
+      dealWithUserAction({
         role: 'general',
         cmd: 'dealWithUserAction',
         req: req,
         res: res,
         desiredAction: 'deleteComment'
       }, function(err, resJson) {
+        console.log(err);
         if (err) res.status(500).json({
           error: 'seneca ERROR in router',
           details: err,
@@ -208,13 +218,14 @@ var initRouter = function(router, app) {
 
   router.route('/questions/:questionId/comments/:commentId')
     .put(function(req, res) {
-      seneca.act({
+      dealWithUserAction({
         role: 'general',
         cmd: 'dealWithUserAction',
         req: req,
         res: res,
         desiredAction: 'updateComment'
       }, function(err, resJson) {
+        console.log(err);
         if (err) res.status(500).json({
           error: 'seneca ERROR in router',
           details: err,
@@ -226,13 +237,52 @@ var initRouter = function(router, app) {
 
   router.route('/questions/:questionId/comments/:commentId/report')
     .post(function(req, res) {
-      seneca.act({
+      dealWithUserAction({
         role: 'general',
         cmd: 'dealWithUserAction',
         req: req,
         res: res,
         desiredAction: 'reportComment'
       }, function(err, resJson) {
+        console.log(err);
+        if (err) res.status(500).json({
+          error: 'seneca ERROR in router',
+          details: err,
+          req: req.params
+        });
+        res.json(resJson);
+      });
+    });
+
+  router.route('/questions/:questionId/comments/:commentId/approve')
+    .post(function(req, res) {
+      dealWithUserAction({
+        role: 'general',
+        cmd: 'dealWithUserAction',
+        req: req,
+        res: res,
+        desiredAction: 'approveComment'
+      }, function(err, resJson) {
+        console.log(err);
+        if (err) res.status(500).json({
+          error: 'seneca ERROR in router',
+          details: err,
+          req: req.params
+        });
+        res.json(resJson);
+      });
+    });
+
+  router.route('/questions/:questionId/comments/:commentId/disapprove')
+    .post(function(req, res) {
+      dealWithUserAction({
+        role: 'general',
+        cmd: 'dealWithUserAction',
+        req: req,
+        res: res,
+        desiredAction: 'disapproveComment'
+      }, function(err, resJson) {
+        console.log(err);
         if (err) res.status(500).json({
           error: 'seneca ERROR in router',
           details: err,
@@ -244,13 +294,14 @@ var initRouter = function(router, app) {
 
   router.route('/questions/:questionId/report')
     .post(function(req, res) {
-      seneca.act({
+      dealWithUserAction({
         role: 'general',
         cmd: 'dealWithUserAction',
         req: req,
         res: res,
         desiredAction: 'reportQuestion'
       }, function(err, resJson) {
+        console.log(err);
         if (err) res.status(500).json({
           error: 'seneca ERROR in router',
           details: err,
@@ -262,13 +313,14 @@ var initRouter = function(router, app) {
 
   router.route('/questions/votables')
     .get(function(req, res) {
-      seneca.act({
+      dealWithUserAction({
         role: 'general',
         cmd: 'dealWithUserAction',
         req: req,
         res: res,
         desiredAction: 'getVotableQuestions'
       }, function(err, resJson) {
+        console.log(err);
         if (err) res.status(500).json({
           error: 'seneca ERROR in router',
           details: err,
@@ -280,13 +332,14 @@ var initRouter = function(router, app) {
 
   router.route('/questions/toReview')
     .get(function(req, res) {
-      seneca.act({
+      dealWithUserAction({
         role: 'general',
         cmd: 'dealWithUserAction',
         req: req,
         res: res,
         desiredAction: 'getQuestionsToReview'
       }, function(err, resJson) {
+        console.log(err);
         if (err) res.status(500).json({
           error: 'seneca ERROR in router',
           details: err,
@@ -298,13 +351,14 @@ var initRouter = function(router, app) {
 
   router.route('/comments/toReview')
     .get(function(req, res) {
-      seneca.act({
+      dealWithUserAction({
         role: 'general',
         cmd: 'dealWithUserAction',
         req: req,
         res: res,
         desiredAction: 'getCommentsToReview'
       }, function(err, resJson) {
+        console.log(err);
         if (err) res.status(500).json({
           error: 'seneca ERROR in router',
           details: err,
@@ -316,13 +370,14 @@ var initRouter = function(router, app) {
 
   router.route('/questions/promotables')
     .get(function(req, res) {
-      seneca.act({
+      dealWithUserAction({
         role: 'general',
         cmd: 'dealWithUserAction',
         req: req,
         res: res,
         desiredAction: 'getPromotableQuestions'
       }, function(err, resJson) {
+        console.log(err);
         if (err) res.status(500).json({
           error: 'seneca ERROR in router',
           details: err,
@@ -334,13 +389,14 @@ var initRouter = function(router, app) {
 
   router.route('/questions/:questionId')
     .get(function(req, res) {
-      seneca.act({
+      dealWithUserAction({
         role: 'general',
         cmd: 'dealWithUserAction',
         req: req,
         res: res,
         desiredAction: 'getQuestion'
       }, function(err, resJson) {
+        console.log(err);
         if (err) res.status(500).json({
           error: 'seneca ERROR in router',
           details: err,

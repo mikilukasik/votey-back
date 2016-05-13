@@ -64,7 +64,12 @@ var libs = {
 }
 
 seneca.use('./modules/sen.loginActions.js', libs);
-seneca.use('./modules/sen.dealWithUserAction.js', libs);
+//seneca.use('./modules/sen.dealWithUserAction.js', libs);
+
+
+var dealWithUserAction = require('./modules/dealWithUserAction.js')(libs);
+
+
 //seneca.use('./modules/sen.questionActions.js', libs);
 //seneca.use('./modules/idActions.js', libs);
 
