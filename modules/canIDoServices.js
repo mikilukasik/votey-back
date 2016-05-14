@@ -335,7 +335,7 @@ var exporter = function(libs) {
       var j = services.question.approvedBy.length;
 
       while (j--) {
-        if (services.question.approvedBy[j] == services.clientMongoId) return true;
+        if (services.question.approvedBy[j].clientMongoId == services.clientMongoId) return true;
       }
 
       if (!dontPushMsg) services.messages.cantDo.push('Did not approve question yet.')
@@ -354,7 +354,7 @@ var exporter = function(libs) {
       var j = services.question.disapprovedBy.length;
 
       while (j--) {
-        if (services.question.disapprovedBy[j] == services.clientMongoId) return true;
+        if (services.question.disapprovedBy[j].clientMongoId == services.clientMongoId) return true;
       }
 
       if (!dontPushMsg) services.messages.cantDo.push('Did not disapprove question yet.')
@@ -373,7 +373,7 @@ var exporter = function(libs) {
       var j = services.question.reportedBy.length;
 
       while (j--) {
-        if (services.question.reportedBy[j] == services.clientMongoId) return true;
+        if (services.question.reportedBy[j].clientMongoId == services.clientMongoId) return true;
       }
 
       if (!dontPushMsg) services.messages.cantDo.push('Did not report question yet.')
@@ -395,9 +395,9 @@ var exporter = function(libs) {
           var j = services.question.comments[i].reportedBy.length;
 
           while (j--) {
-            if (services.question.comments[i].reportedBy[j] == services.clientMongoId) return true;
+            if (services.question.comments[i].reportedBy[j].clientMongoId == services.clientMongoId) return true;
           }
-
+          break;
         }
       }
 
@@ -405,14 +405,57 @@ var exporter = function(libs) {
 
     };
 
-    //TODO: write below functions
+    services.alreadyApprovedComment = function(dontPushMsg) {
+
+      var i = services.question.comments.length;
+      while (i--) {
+        if (services.question.comments[i].id == services.commentId) {
+
+          var j = services.question.comments[i].approvedBy.length;
+
+          while (j--) {
+            if (services.question.comments[i].approvedBy[j].clientMongoId == services.clientMongoId) return true;
+          }
+          break;
+        }
+      }
+
+      if (!dontPushMsg) services.messages.cantDo.push('Did not approve comment yet.')
+
+    };
+
+    services.alreadyDisapprovedComment = function(dontPushMsg) {
+
+      var i = services.question.comments.length;
+
+      while (i--) {
+        
+        if (services.question.comments[i].id == services.commentId) {
+
+          var j = services.question.comments[i].disapprovedBy.length;
+
+          while (j--) {
+            if (services.question.comments[i].disapprovedBy[j].clientMongoId == services.clientMongoId) return true;
+          }
+          break;
+        }
+      }
+
+      if (!dontPushMsg) services.messages.cantDo.push('Did not disapprove comment yet.')
+
+    };
 
     services.not.alreadyApprovedComment = function(){
-      return true;
+      if (!services.alreadyApprovedComment(1)) return true;
+
+      services.messages.cantDo.push('Already approved comment.')
     };
 
     services.not.alreadyDisapprovedComment = function(){
-      return true;
+      
+      if (!services.alreadyDisapprovedComment(1)) return true;
+
+      services.messages.cantDo.push('Already disapproved comment.')
     };
 
     services.not.alreadyReportedComment = function() {
@@ -516,7 +559,7 @@ var exporter = function(libs) {
       var j = services.questionList.length;
       while (j--) {
         if (_.some(services.questionList[j].reportedBy, function(thisReporter) {
-            return thisReporter == services.clientMongoId
+            return thisReporter.clientMongoId == services.clientMongoId
           })) {
           services.questionList.splice(j, 1);
         }
@@ -529,7 +572,7 @@ var exporter = function(libs) {
       var j = services.questionList.length;
       while (j--) {
         if (_.some(services.questionList[j].approvedBy, function(thisUser) {
-            return thisUser == services.clientMongoId
+            return thisUser.clientMongoId == services.clientMongoId
           })) {
           services.questionList.splice(j, 1);
         }
@@ -542,9 +585,35 @@ var exporter = function(libs) {
       var j = services.questionList.length;
       while (j--) {
         if (_.some(services.questionList[j].disapprovedBy, function(thisUser) {
-            return thisUser == services.clientMongoId
+            return thisUser.clientMongoId == services.clientMongoId
           })) {
           services.questionList.splice(j, 1);
+        }
+      };
+
+    };
+
+    services.removeReportedCommentsIApproved = function() {
+
+      var j = services.reportedCommentsList.length;
+      while (j--) {
+        if (_.some(services.reportedCommentsList[j].approvedBy, function(thisUser) {
+            return thisUser.clientMongoId == services.clientMongoId
+          })) {
+          services.reportedCommentsList.splice(j, 1);
+        }
+      };
+
+    };
+
+    services.removeReportedCommentsIDisapproved = function() {
+
+      var j = services.reportedCommentsList.length;
+      while (j--) {
+        if (_.some(services.reportedCommentsList[j].disapprovedBy, function(thisUser) {
+            return thisUser.clientMongoId == services.clientMongoId
+          })) {
+          services.reportedCommentsList.splice(j, 1);
         }
       };
 
@@ -587,7 +656,7 @@ var exporter = function(libs) {
         var shouldRemove = false;
         var j = services.question.comments[i].reportedBy.length;
         while (j--) {
-          if (services.question.comments[i].reportedBy[j] == services.clientMongoId) shouldRemove = true;
+          if (services.question.comments[i].reportedBy[j].clientMongoId == services.clientMongoId) shouldRemove = true;
         };
         if (shouldRemove) services.question.comments.splice(i, 1);
       };
@@ -600,12 +669,50 @@ var exporter = function(libs) {
 
           var thisComment = services.question.comments[i];
 
-          thisComment.reportedBy.push(services.clientMongoId);
+          thisComment.reportedBy.push(new classes.Approver({},services.client));
 
           services.question.hasReportedCommets = true;
 
           services.messages.success.push('Comment reported.');
           services.addToSave('question');
+
+          break;
+        };
+      };
+
+    };
+
+    services.approveCommentOnQuestion = function() {
+      var i = services.question.comments.length;
+      while (i--) {
+        if (services.question.comments[i].id == services.commentId) {
+
+          var thisComment = services.question.comments[i];
+
+          thisComment.approvedBy.push(new classes.Approver({},services.client));
+
+          services.messages.success.push('Comment approved.');
+          services.addToSave('question');
+
+          break;
+        };
+      };
+
+    };
+
+    services.disapproveCommentOnQuestion = function() {
+      var i = services.question.comments.length;
+      while (i--) {
+        if (services.question.comments[i].id == services.commentId) {
+
+          var thisComment = services.question.comments[i];
+
+          thisComment.disapprovedBy.push(new classes.Approver({},services.client));
+
+          services.messages.success.push('Comment disapproved.');
+          services.addToSave('question');
+
+          break;
         };
       };
 
@@ -613,7 +720,8 @@ var exporter = function(libs) {
 
     services.reportQuestion = function() {
 
-      services.question.reportedBy.push(services.clientMongoId);
+      services.question.reportedBy.push(new classes.Approver({},services.client));
+
 
       services.messages.success.push('Question reported.');
       services.addToSave('question');
@@ -622,7 +730,7 @@ var exporter = function(libs) {
 
     services.approveQuestion = function() {
 
-      services.question.approvedBy.push(services.clientMongoId);
+      services.question.approvedBy.push(new classes.Approver({},services.client));
 
       services.messages.success.push('Question approved.');
       services.addToSave('question');
@@ -631,7 +739,7 @@ var exporter = function(libs) {
 
     services.disapproveQuestion = function() {
 
-      services.question.disapprovedBy.push(services.clientMongoId);
+      services.question.disapprovedBy.push(new classes.Approver({},services.client));
 
       services.messages.success.push('Question disapproved.');
       services.addToSave('question');

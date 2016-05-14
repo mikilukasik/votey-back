@@ -58,7 +58,8 @@ var rules = {
 
       loaderAsync: function(services) {
         return [
-          services.loadQuestion()
+          services.loadQuestion(),
+          services.loadClient()
         ]
       },
 
@@ -121,7 +122,8 @@ var rules = {
 
       loaderAsync: function(services) {
         return [
-          services.loadQuestion()
+          services.loadQuestion(),
+          services.loadClient()
         ]
       },
 
@@ -711,13 +713,12 @@ var rules = {
 
       loaderAsync: function(services) {
         return [
-          services.loadQuestion()
+          services.loadQuestion(),
+          services.loadClient()
         ];
       },
 
       canIDo: function(services) {
-
-
 
         return services.not.alreadyReportedComment()  ;//true;//services.not.questionHeaderExists() //services.hasEnoughCredit() && services.hasEnoughUserLevel()
 
@@ -763,7 +764,7 @@ var rules = {
       credit: {
 
         cost: 0,
-        earn: 0,
+        earn: 5,
         minNeeded: 0
 
       },
@@ -777,19 +778,20 @@ var rules = {
 
       loaderAsync: function(services) {
         return [
-          services.loadQuestion()
+          services.loadQuestion(),
+          services.loadClient()
         ];
       },
 
       canIDo: function(services) {
 
-        return services.not.alreadyApprovedComment()  ;//true;//services.not.questionHeaderExists() //services.hasEnoughCredit() && services.hasEnoughUserLevel()
+        return services.not.alreadyApprovedComment() && services.not.alreadyDisapprovedComment();//true;//services.not.questionHeaderExists() //services.hasEnoughCredit() && services.hasEnoughUserLevel()
 
       },
 
       whatToDo: function(services) {
 
-        services.reportCommentOnQuestion();
+        services.approveCommentOnQuestion();
 
       },
 
@@ -841,13 +843,14 @@ var rules = {
 
       loaderAsync: function(services) {
         return [
-          services.loadQuestion()
+          services.loadQuestion(),
+          services.loadClient()
         ];
       },
 
       canIDo: function(services) {
         
-        return services.not.alreadyDisapprovedComment();//true;//services.not.questionHeaderExists() //services.hasEnoughCredit() && services.hasEnoughUserLevel()
+        return services.not.alreadyApprovedComment() && services.not.alreadyDisapprovedComment();//true;//services.not.questionHeaderExists() //services.hasEnoughCredit() && services.hasEnoughUserLevel()
 
       },
 
@@ -858,7 +861,7 @@ var rules = {
           comment: services.comment,
           question: services.question
         })
-        services.reportCommentOnQuestion();
+        services.disapproveCommentOnQuestion();
 
       },
 
@@ -909,7 +912,8 @@ var rules = {
 
       loaderAsync: function(services) {
         return [
-          services.loadQuestion()
+          services.loadQuestion(),
+          services.loadClient()
         ];
       },
 
@@ -1144,7 +1148,6 @@ var rules = {
         
         services.removeQuestionsIApproved();
         services.removeQuestionsIDisapproved();
-
         services.sortQuestionsByNumberOfReports();
         
       },
@@ -1206,6 +1209,10 @@ var rules = {
 
       whatToDo: function(services) {
         services.buildReportedCommentsList();
+        
+        services.removeReportedCommentsIApproved();
+        services.removeReportedCommentsIDisapproved();
+
         services.sortReportedCommentsListByNumberOfReports();
       },
 

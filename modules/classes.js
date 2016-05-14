@@ -1,4 +1,4 @@
-var rules = {
+var classes = {
 
   Question: function(definedPropertiesObject){
 
@@ -22,7 +22,46 @@ var rules = {
   
   },
 
+  Approver: function(definedPropertiesObject,client){
+
+    var approver = this;
+
+    approver.clientMongoId = '';
+    approver.userLevel = 0;
+    approver.credit = 0;
+
+    if(client){
+        console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
+        approver.clientMongoId = client._id;
+        approver.userLevel = client.userLevel;
+        approver.credit = client.credit;
+    }
+
+    if(definedPropertiesObject) for (key in definedPropertiesObject){ approver[key] = definedPropertiesObject[key]; }
+  
+  },
+
+  Client: function(definedPropertiesObject){
+    
+    var client = this;
+
+
+    //client._id = '';
+
+    client.username = false;
+    client.hardWareId = false;
+    client.promotions = [];
+    client.votes = [];
+    client.created = new Date();
+    client.preferences = {};
+
+    client.userLevel = 0;
+    client.credit = 0;
+
+    if(definedPropertiesObject) for (key in definedPropertiesObject){ client[key] = definedPropertiesObject[key]; }
+
+  }
   
 }
 
-module.exports = rules;
+module.exports = classes;

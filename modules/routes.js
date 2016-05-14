@@ -26,7 +26,7 @@ var initRouter = function(router, app) {
 
   router.route('/login') //register
     .post(function(req, res) {
-      dealWithUserAction({
+      seneca.act({
         role: 'login',
         cmd: 'register',
         req: req
@@ -43,7 +43,7 @@ var initRouter = function(router, app) {
 
   router.route('/login') //login
     .put(function(req, res) {
-      dealWithUserAction({
+      seneca.act({
         role: 'login',
         cmd: 'login',
         req: req
@@ -415,41 +415,34 @@ var initRouter = function(router, app) {
 
   ////////////////////// id /////////////////////////
 
-  router.route('/client-mongo-id/:hardWareId')
+  router.route('/client-mongo-id/:hardwareId')
     .get(function(req, res) {
 
-      var hardWareId = req.params.hardWareId;
+      var hardwareId = req.params.hardwareId;
 
-      if (hardWareId === 'newBrowser') {
-        hardWareId = 'some browser ' + Math.random();
+      if (hardwareId === 'newBrowser') {
+        hardwareId = 'some browser ' + Math.random();
       };
 
       db.findOne('clients', {
-        hardWareId: hardWareId,
+        hardwareId: hardwareId,
         username: false
       }).then(function(myRecord) {
         if (!myRecord) {
 
           //new client
-          db.save('clients', {
+          db.save('clients', new classes.Client({
 
-            username: false,
-            hardWareId: hardWareId,
-            promotions: [],
-            votes: [],
-            firstSeen: new Date(),
-            preferences: {
-
-            },
-
-          }).then(function(myNewRecord) {
+            hardwareId: hardwareId,
+            
+          })).then(function(myNewRecord) {
             res.json({
               clientMongoId: myNewRecord._id
             })
           }, function(err) {
-            console.log('route ERROR when saving to db, GET /client-mongo-id/:hardWareId', err);
+            console.log('route ERROR when saving to db, GET /client-mongo-id/:hardwareId', err);
             res.status(500).json({
-              error: 'route ERROR, GET /client-mongo-id/' + hardWareId,
+              error: 'route ERROR, GET /client-mongo-id/' + hardwareId,
               details: err,
               req: req.params
             });
@@ -461,9 +454,9 @@ var initRouter = function(router, app) {
           })
         }
       }, function(err) {
-        console.log('route ERROR when reading from db, GET /client-mongo-id/:hardWareId', err);
+        console.log('route ERROR when reading from db, GET /client-mongo-id/:hardwareId', err);
         res.status(500).json({
-          error: 'route ERROR, GET /client-mongo-id/' + hardWareId,
+          error: 'route ERROR, GET /client-mongo-id/' + hardwareId,
           details: err,
           req: req.params
         });
@@ -481,7 +474,7 @@ var initRouter = function(router, app) {
       if (!myRecord) {
         //send res error
 
-        res.status(404).send('Unknown clientMongoId, please send hardWareId');
+        res.status(404).send('Unknown clientMongoId, please send hardwareId');
 
       } else {
         //known client
@@ -509,19 +502,7 @@ var initRouter = function(router, app) {
         _id: objId
       }, function(myRecord) { //update in cb and save after
         if (!myRecord) {
-          db.save('clients', {
-            _id: objId,
-
-            username: false,
-            hardWareId: false,
-            promotions: [],
-            votes: [],
-            recovered: new Date(),
-            preferences: {
-
-            }
-
-          }).then(function(myNewRecord) {
+          db.save('clients', new classes.Client({ _id: objId })).then(function(myNewRecord) {
             res.json({
               clientMongoId: myNewRecord._id
             })
