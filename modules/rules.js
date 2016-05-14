@@ -1433,6 +1433,66 @@ var rules = {
         };
       }
 
+    },
+
+    addCredit: {
+
+      name: {
+        type: 'userActions',
+        action: 'addCredit'
+      },
+
+      minUserLevel: 0,
+
+      credit: {
+
+        cost: 0,
+        earn: 0,
+        minNeeded: 0
+
+      },
+
+      serviceBuilder: function(req) {
+        return {
+          addCreditAmount: Number(req.body.addCreditAmount)
+        };
+      },
+
+      loaderAsync: function(services) {
+        return [
+          services.loadClient()
+        ]
+      },
+
+      canIDo: function(services) {
+        return true;
+      },
+
+      whatToDo: function(services) {
+        if (services.addCreditAmount) services.client.credit = Number(services.client.credit) + services.addCreditAmount;
+        services.addToSave('client');
+      },
+
+      successPostFlightAsync: function(services) {
+        return [
+          services.saveData()
+        ];
+      },
+
+      successResponseBuilder: function(services) {
+        return {
+          toast: undefined,
+          data: services.client.credit
+        };
+      },
+
+      cantDoResponseBuilder: function(services) {
+        return {
+          toast: services.getCantDoMessagesStr(),
+          data: undefined
+        };
+      }
+
     }
 
   },

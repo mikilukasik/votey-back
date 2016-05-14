@@ -426,6 +426,25 @@ var initRouter = function(router, app) {
       });
     });
 
+  router.route('/addCredit')
+    .post(function(req, res) {
+      dealWithUserAction({
+        role: 'general',
+        cmd: 'dealWithUserAction',
+        req: req,
+        res: res,
+        desiredAction: 'addCredit'
+      }, function(err, resJson) {
+        console.log(err);
+        if (err) res.status(500).json({
+          error: 'seneca ERROR in router',
+          details: err,
+          req: req.params
+        });
+        res.json(resJson);
+      });
+    });
+
   router.route('/check')
     .get(function(req, res) {
 
