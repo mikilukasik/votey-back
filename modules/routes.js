@@ -61,6 +61,26 @@ var initRouter = function(router, app) {
 
   ///////////////////// vote and promote //////////////////////
 
+  router.route('/credit')
+    .get(function(req, res) {
+      dealWithUserAction({
+        role: 'general',
+        cmd: 'dealWithUserAction',
+        req: req,
+        res: res,
+        desiredAction: 'getMyCredit'
+      }, function(err, resJson) {
+        console.log(err);
+        if (err) res.status(500).json({
+          error: 'seneca ERROR in router',
+          details: err,
+          req: req.params
+        });
+        res.json(resJson);
+      });
+
+    });
+
   router.route('/promotions')
     .post(function(req, res) {
       dealWithUserAction({

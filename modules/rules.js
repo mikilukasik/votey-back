@@ -2,16 +2,18 @@ var rules = {
 
   //  user levels:
   //  
-  //  0 - 4.9 : user
+  //  0 - 1.9 : restricted user
+  //  2 - 4.9 : normal user
   //  5 - 9.9 : admin
   //  10      : developer
+
   shortenedQuestionBodyLength : 150,      //max number of characters of question body that can be displayed on a card (list)
 
 
   menuItems: {
 
     'Add Question': {
-      minUserLevel: 5
+      minUserLevel: 2
     },
     'Promote Question': {
       minUserLevel: 0
@@ -65,13 +67,16 @@ var rules = {
 
       canIDo: function(services) {
 
-        return services.not.alreadyApprovedThisQuestion() && services.not.alreadyDisapprovedThisQuestion();
-
+        return services.not.alreadyApprovedThisQuestion() 
+          && services.not.alreadyDisapprovedThisQuestion() 
+          && services.hasEnoughCredit() 
+          && services.hasEnoughUserLevel();
       },
 
       whatToDo: function(services) {
 
         services.approveQuestion();
+        services.adjustUserCredit();
 
       },
 
@@ -129,13 +134,17 @@ var rules = {
 
       canIDo: function(services) {
 
-        return services.not.alreadyApprovedThisQuestion() && services.not.alreadyDisapprovedThisQuestion();
+        return services.not.alreadyApprovedThisQuestion() 
+          && services.not.alreadyDisapprovedThisQuestion() 
+          && services.hasEnoughCredit()
+          && services.hasEnoughUserLevel();
 
       },
 
       whatToDo: function(services) {
 
         services.disapproveQuestion();
+        services.adjustUserCredit();
 
       },
 
@@ -174,9 +183,9 @@ var rules = {
 
       credit: {
 
-        cost: 0,
-        earn: 5,
-        minNeeded: 10
+        cost: 10,
+        earn: 0,
+        minNeeded: 20
 
       },
 
@@ -195,7 +204,10 @@ var rules = {
 
       canIDo: function(services) {
 
-        return services.not.alreadyVotedYes() && services.questionIsVotable() // && services.hasEnoughCredit() && services.hasEnoughUserLevel()
+        return services.not.alreadyVotedYes() 
+          && services.questionIsVotable() 
+          && services.hasEnoughCredit() 
+          && services.hasEnoughUserLevel();
 
       },
 
@@ -239,9 +251,9 @@ var rules = {
 
       credit: {
 
-        cost: 0,
-        earn: 5,
-        minNeeded: 10
+        cost: 10,
+        earn: 0,
+        minNeeded: 20
 
       },
 
@@ -260,8 +272,10 @@ var rules = {
 
       canIDo: function(services) {
 
-        return services.not.alreadyVotedNo() && services.questionIsVotable()// && services.hasEnoughCredit() && services.hasEnoughUserLevel()
-
+        return services.not.alreadyVotedNo() 
+          && services.questionIsVotable()
+          && services.hasEnoughCredit() 
+          && services.hasEnoughUserLevel();
       },
 
       whatToDo: function(services) {
@@ -305,7 +319,7 @@ var rules = {
       credit: {
 
         cost: 0,
-        earn: 5,
+        earn: 50,
         minNeeded: 0
 
       },
@@ -325,8 +339,10 @@ var rules = {
 
       canIDo: function(services) {
 
-        return services.not.alreadyPromotedUp() && services.not.questionIsVotable(); // && services.hasEnoughCredit.toPromote.up() && services.hasEnoughUserLevel.toPromote.up()
-
+        return services.not.alreadyPromotedUp() 
+          && services.not.questionIsVotable() // && services.hasEnoughCredit.toPromote.up() && services.hasEnoughUserLevel.toPromote.up()
+          && services.hasEnoughCredit() 
+          && services.hasEnoughUserLevel();
       },
 
       whatToDo: function(services) {
@@ -370,7 +386,7 @@ var rules = {
       credit: {
 
         cost: 0,
-        earn: 5,
+        earn: 50,
         minNeeded: 0
 
       },
@@ -390,8 +406,10 @@ var rules = {
 
       canIDo: function(services) {
 
-        return services.not.alreadyPromotedDown() && services.not.questionIsVotable(); // && services.hasEnoughCredit.toPromote.up() && services.hasEnoughUserLevel.toPromote.up()
-
+        return services.not.alreadyPromotedDown() 
+          && services.not.questionIsVotable() // && services.hasEnoughCredit.toPromote.up() && services.hasEnoughUserLevel.toPromote.up()
+          && services.hasEnoughCredit() 
+          && services.hasEnoughUserLevel();
       },
 
       whatToDo: function(services) {
@@ -430,13 +448,13 @@ var rules = {
         action: 'postNewQuestion'
       },
 
-      minUserLevel: 5, //admin
+      minUserLevel: 2, //not restricted regular user
 
       credit: {
 
-        cost: 0,
+        cost: 100,
         earn: 0,
-        minNeeded: 0
+        minNeeded: 100
 
       },
 
@@ -450,19 +468,22 @@ var rules = {
         return [
           services.loadQuestionList({
             header: services.newQuestion.header
-          })
+          }),
+          services.loadClient()
         ];
       },
 
       canIDo: function(services) {
 
         return services.not.questionHeaderExists() //services.hasEnoughCredit() && services.hasEnoughUserLevel()
-
+          && services.hasEnoughCredit() 
+          && services.hasEnoughUserLevel()
       },
 
       whatToDo: function(services) {
 
         services.postNewQuestion();
+        services.adjustUserCredit();
 
       },
 
@@ -495,13 +516,13 @@ var rules = {
         action: 'postNewComment'
       },
 
-      minUserLevel: 0, 
+      minUserLevel: 2, 
 
       credit: {
 
         cost: 0,
         earn: 0,
-        minNeeded: 0
+        minNeeded: 100
 
       },
 
@@ -514,13 +535,15 @@ var rules = {
 
       loaderAsync: function(services) {
         return [
-          services.loadQuestion()
+          services.loadQuestion(),
+          services.loadClient()
         ];
       },
 
       canIDo: function(services) {
 
-        return true;//services.not.questionHeaderExists() //services.hasEnoughCredit() && services.hasEnoughUserLevel()
+        return services.hasEnoughCredit() 
+          && services.hasEnoughUserLevel();
 
       },
 
@@ -528,6 +551,7 @@ var rules = {
 
         services.addIdToNewComment();
         services.addNewCommentToQuestion();
+        services.adjustUserCredit();
 
       },
 
@@ -579,13 +603,15 @@ var rules = {
 
       loaderAsync: function(services) {
         return [
-          services.loadQuestion()
+          services.loadQuestion(),
+          services.loadClient()
         ];
       },
 
       canIDo: function(services) {
 
-        return true;//services.not.questionHeaderExists() //services.hasEnoughCredit() && services.hasEnoughUserLevel()
+        return services.hasEnoughCredit() 
+          && services.hasEnoughUserLevel(); //services.not.questionHeaderExists() //services.hasEnoughCredit() && services.hasEnoughUserLevel()
 
       },
 
@@ -720,7 +746,7 @@ var rules = {
 
       canIDo: function(services) {
 
-        return services.not.alreadyReportedComment()  ;//true;//services.not.questionHeaderExists() //services.hasEnoughCredit() && services.hasEnoughUserLevel()
+        return services.not.alreadyReportedComment();//true;//services.not.questionHeaderExists() //services.hasEnoughCredit() && services.hasEnoughUserLevel()
 
       },
 
@@ -792,6 +818,7 @@ var rules = {
       whatToDo: function(services) {
 
         services.approveCommentOnQuestion();
+        services.adjustUserCredit();
 
       },
 
@@ -855,13 +882,9 @@ var rules = {
       },
 
       whatToDo: function(services) {
-        console.log({
-          commentId: services.commentId,
-          questionId: services.questionId,
-          comment: services.comment,
-          question: services.question
-        })
+        
         services.disapproveCommentOnQuestion();
+        services.adjustUserCredit();
 
       },
 
@@ -921,7 +944,7 @@ var rules = {
 
 
 
-        return services.not.alreadyReportedQuestion()  ;//true;//services.not.questionHeaderExists() //services.hasEnoughCredit() && services.hasEnoughUserLevel()
+        return services.not.alreadyReportedQuestion();//true;//services.not.questionHeaderExists() //services.hasEnoughCredit() && services.hasEnoughUserLevel()
 
       },
 
@@ -1347,6 +1370,59 @@ var rules = {
         return {
           toast: undefined,
           data: services.getMyQuestion()
+        };
+      },
+
+      cantDoResponseBuilder: function(services) {
+        return {
+          toast: services.getCantDoMessagesStr(),
+          data: undefined
+        };
+      }
+
+    },
+
+    getMyCredit: {
+
+      name: {
+        type: 'userActions',
+        action: 'getMyCredit'
+      },
+
+      minUserLevel: 0,
+
+      credit: {
+
+        cost: 0,
+        earn: 0,
+        minNeeded: 0
+
+      },
+
+      serviceBuilder: function(req) {
+        return {};
+      },
+
+      loaderAsync: function(services) {
+        return [
+          services.loadClient()
+        ]
+      },
+
+      canIDo: function(services) {
+        return true;
+      },
+
+      whatToDo: function(services) {},
+
+      successPostFlightAsync: function(services) {
+        return [];
+      },
+
+      successResponseBuilder: function(services) {
+        return {
+          toast: undefined,
+          data: services.client.credit
         };
       },
 

@@ -82,11 +82,11 @@ var exporter = function(libs) {
       });
     };
 
-    services.getMyQuestionList = function() { //TODO: set order, filter, add myVotes
+    services.getMyQuestionList = function() { 
       return services.questionList;
     };
 
-    services.getMyQuestion = function() { //TODO: add myVotes
+    services.getMyQuestion = function() { 
       return services.question;
     };
 
@@ -164,15 +164,6 @@ var exporter = function(libs) {
 
       return Promise.all(savingPromises);
     };
-
-    // services.doAndSaveData = function(optionalUserAction) {
-
-    //   var userAction = (optionalUserAction) ? optionalUserAction : services.desiredAction;
-
-    //   services.doIt(userAction);
-    //   return services.saveData();
-
-    // };
 
     services.justDoIt = function(optionalUserAction) {
 
@@ -305,7 +296,6 @@ var exporter = function(libs) {
     };
 
     services.registeredPromotion = function() {
-
       var registeredPromotion = services.getRegisteredPromotionObject();
 
       if (registeredPromotion) {
@@ -514,12 +504,23 @@ var exporter = function(libs) {
       services.messages.cantDo.push('Question already exists.')
     };
 
-    services.hasEnoughUserLevel = function() {
+    services.hasEnoughUserLevel = function(dontPushMsg) {
+      var userLevelNeeded = rules.userActions[services.desiredAction].minUserLevel;
+      var actualUserLevel = services.client.userLevel;
 
+      if (actualUserLevel >= userLevelNeeded) return true;
+      if (!dontPushMsg) services.messages.cantDo.push("You don't have enough user level (min: " + userLevelNeeded + ", you have: " + actualUserLevel + ")");
     };
 
-    services.hasEnoughCredit = function() {
+    services.hasEnoughCredit = function(dontPushMsg) {
+      var creditNeeded = ( rules.userActions[services.desiredAction].credit.minNeeded > rules.userActions[services.desiredAction].credit.cost )
+        ? rules.userActions[services.desiredAction].credit.minNeeded
+        : rules.userActions[services.desiredAction].credit.cost
 
+      var actualCredit = services.client.credit;
+
+      if (actualCredit >= creditNeeded) return true;
+      if (!dontPushMsg) services.messages.cantDo.push("You don't have enough credit (min: " + creditNeeded + ", you have: " + actualCredit + ")");
     };
 
     //////////////////////////////  doIt  /////////////////////////////
@@ -898,6 +899,10 @@ var exporter = function(libs) {
     };
 
     services.adjustUserCredit = function() {
+
+      services.client.credit += rules.userActions[services.desiredAction].credit.earn;
+      services.client.credit -= rules.userActions[services.desiredAction].credit.cost;
+      services.addToSave('client')
 
     };
 

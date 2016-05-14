@@ -4,7 +4,8 @@ module.exports = function(libs) {
   var _ = libs._;
   var rules = libs.rules;
   var CanIDoServices = libs.CanIDoServices;
-  var bcrypt = libs.bcrypt; 
+  var bcrypt = libs.bcrypt;
+  var classes= libs.classes; 
 
   var seneca = this;
 
@@ -120,20 +121,14 @@ module.exports = function(libs) {
         //new user
         bcrypt.hash(password, 10, function(err, hash) {
 
-          db.save('clients', {
+          db.save('clients', new classes.Client({ 
 
             username: username,
             passwordHash: hash,
-            hardWareId: hardWareId,
-            promotions: [],
-            votes: [],
-            registered: new Date(),
-            preferences: {
+            hardWareId: hardWareId, 
 
-            }
-          }).then(function(client) {
-            
-
+          })).then(function(client) {
+          
             done(null, {
               toast: {
                 type: 'success',
