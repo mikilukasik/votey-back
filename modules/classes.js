@@ -31,7 +31,6 @@ var classes = {
     approver.credit = 0;
 
     if(client){
-        console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
         approver.clientMongoId = client._id;
         approver.userLevel = client.userLevel;
         approver.credit = client.credit;
@@ -55,7 +54,7 @@ var classes = {
     client.created = new Date();
     client.preferences = {};
 
-    client.userLevel = 0;
+    client.userLevel = 2;
     client.credit = 0;
 
     if(definedPropertiesObject) for (key in definedPropertiesObject){ client[key] = definedPropertiesObject[key]; }
