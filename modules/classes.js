@@ -18,6 +18,9 @@ var classes = {
     question.approvedBy = [];
     question.disapprovedBy = [];
 
+    question.inappropriate = false;
+    question.verified = false;
+
     if(definedPropertiesObject) for (key in definedPropertiesObject){ question[key] = definedPropertiesObject[key]; }
   
   },

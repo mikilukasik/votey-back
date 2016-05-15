@@ -523,8 +523,6 @@ var exporter = function(libs) {
       if (!dontPushMsg) services.messages.cantDo.push("You don't have enough credit (min: " + creditNeeded + ", you have: " + actualCredit + ")");
     };
 
-    //////////////////////////////  doIt  /////////////////////////////
-
     services.escalateQuestion = function() {
       services.question.votable = true;
 
@@ -581,6 +579,10 @@ var exporter = function(libs) {
 
     };
 
+    services.markQuestionAsInappropriate = function(){
+      services.question.inappropriate = true;
+    };
+
     services.removeQuestionsIDisapproved = function() {
 
       var j = services.questionList.length;
@@ -628,7 +630,8 @@ var exporter = function(libs) {
         var j = services.questionList[i].comments.length;
         while (j--) {
 
-          if (services.questionList[i].comments[j].reportedBy.length > 0) {
+          if (  services.questionList[i].comments[j].reportedBy.length > 0 && 
+               !services.questionList[i].comments[j].verified) {
 
             services.reportedCommentsList.push(services.questionList[i].comments[j]);
 
@@ -681,6 +684,31 @@ var exporter = function(libs) {
         };
       };
 
+    };
+
+    services.verifyComment = function() {
+      var i = services.question.comments.length;
+      while (i--) {
+        if (services.question.comments[i].id == services.commentId) {
+          var thisComment = services.question.comments[i];
+
+          thisComment.verified = true;
+
+          services.addToSave('question');
+
+          break;
+        };
+      };
+    };
+
+    services.verifyQuestion = function() {
+     
+          console.log('@@@@@@@@@@@verifying question')
+          services.question.verified = true;
+
+          services.addToSave('question');
+
+         
     };
 
     services.approveCommentOnQuestion = function() {
@@ -949,6 +977,205 @@ var exporter = function(libs) {
       }
 
       return result;
+    };
+
+    services.loadCommentSync = function(){
+      var i = services.question.comments.length;
+      while (i--) {
+        if (services.question.comments[i].id == services.commentId) {
+          services.comment = services.question.comments[i];
+          break;
+        }
+      }
+    }
+
+    services.canAutoVerfyComment = function(){
+
+      if(!services.comment) services.loadCommentSync();
+
+      var approverCount = 0;
+      var approvingUserLevelSum = 0;
+      var disapproverCount = 0;
+      var disapprovingUserLevelSum = 0;
+
+      services.comment.approvedBy.forEach(function(approver){
+        approverCount += 1;
+        approvingUserLevelSum += approver.userLevel;
+      });
+
+      services.comment.disapprovedBy.forEach(function(disapprover){
+        disapproverCount += 1;
+        disapprovingUserLevelSum += disapprover.userLevel;
+      });
+
+      var myRules = rules.automaticActions.autoVerfyComment;
+
+      var hasEnoughApproverCount = (approverCount >= myRules.minApproverCount);
+      var hasEnoughApprovingUserLevelSum = (approvingUserLevelSum >= myRules.minApprovingUserLevelSum);
+      var hasEnoughApprovingUserLevelRatio = (disapprovingUserLevelSum * myRules.minApprovingUserLevelRatio <= approvingUserLevelSum);
+      var hasLessThanAllowedDisapprovingUserLevelSum = (disapprovingUserLevelSum <= myRules.maxDisapprovingUserLevelSum);
+      var hasLessThanAllowedDisapproverCount = (disapproverCount <= myRules.maxDisapproverCount);
+     
+      return myRules.canBeDone({
+
+        hasEnoughApproverCount: hasEnoughApproverCount,
+        hasEnoughApprovingUserLevelSum: hasEnoughApprovingUserLevelSum,
+        hasEnoughApprovingUserLevelRatio: hasEnoughApprovingUserLevelRatio,
+        hasLessThanAllowedDisapprovingUserLevelSum: hasLessThanAllowedDisapprovingUserLevelSum,
+        hasLessThanAllowedDisapproverCount: hasLessThanAllowedDisapproverCount
+
+      });
+        
+    };
+
+    services.canAutoRemoveComment = function(){
+
+      if(!services.comment) services.loadCommentSync();
+
+      var approverCount = 0;
+      var approvingUserLevelSum = 0;
+      var disapproverCount = 0;
+      var disapprovingUserLevelSum = 0;
+
+      services.comment.approvedBy.forEach(function(approver){
+        approverCount += 1;
+        approvingUserLevelSum += approver.userLevel;
+      });
+
+      services.comment.disapprovedBy.forEach(function(disapprover){
+        disapproverCount += 1;
+        disapprovingUserLevelSum += disapprover.userLevel;
+      });
+
+      var myRules = rules.automaticActions.autoRemoveComment;
+
+      var hasEnoughDisapproverCount = (disapproverCount >= myRules.minDisapproverCount);
+      var hasEnoughDisapprovingUserLevelSum = (disapprovingUserLevelSum >= myRules.minDisapprovingUserLevelSum);
+      var hasEnoughDisapprovingUserLevelRatio = (approvingUserLevelSum * myRules.minDisapprovingUserLevelRatio <= disapprovingUserLevelSum);
+      var hasLessThanAllowedApprovingUserLevelSum = (approvingUserLevelSum <= myRules.maxApprovingUserLevelSum);
+      var hasLessThanAllowedApproverCount = (approverCount <= myRules.maxApproverCount);
+     
+      return myRules.canBeDone({
+
+        hasEnoughDisapproverCount: hasEnoughDisapproverCount,
+        hasEnoughDisapprovingUserLevelSum: hasEnoughDisapprovingUserLevelSum,
+        hasEnoughDisapprovingUserLevelRatio: hasEnoughDisapprovingUserLevelRatio,
+        hasLessThanAllowedApprovingUserLevelSum: hasLessThanAllowedApprovingUserLevelSum,
+        hasLessThanAllowedApproverCount: hasLessThanAllowedApproverCount
+
+      });
+        
+    };
+
+    services.canAutoEscalateQuestion = function(){
+
+      var upPromoterCount = services.question.promoteUp;
+      //var upPromotingUserLevelSum = 0;
+      var downPromoterCount = services.question.promoteDown;;
+      //var downPromotingUserLevelSum = 0;
+
+      // services.question.upPromotedBy.forEach(function(upPromoter){
+      //   upPromoterCount += 1;
+      //   upPromotingUserLevelSum += upPromoter.userLevel;
+      // });
+
+      // services.question.downPromotedBy.forEach(function(downPromoter){
+      //   downPromoterCount += 1;
+      //   downPromotingUserLevelSum += downPromoter.userLevel;
+      // });
+
+      var myRules = rules.automaticActions.autoEscalateQuestion;
+
+      var hasEnoughUpPromoterCount = (upPromoterCount >= myRules.minUpPromoterCount);
+      //var hasEnoughUpPromotingUserLevelSum = (upPromotingUserLevelSum >= myRules.minUpPromotingUserLevelSum);
+      var hasEnoughUpPromoterRatio = (downPromoterCount * myRules.minUpPromoterRatio <= upPromoterCount);
+      //var hasLessThanAllowedDownPromotingUserLevelSum = (downPromotingUserLevelSum <= myRules.maxDownPromotingUserLevelSum);
+      var hasLessThanAllowedDownPromoterCount = (downPromoterCount <= myRules.maxDownPromoterCount);
+     
+      return myRules.canBeDone({
+
+        hasEnoughUpPromoterCount: hasEnoughUpPromoterCount,
+        //hasEnoughUpPromotingUserLevelSum: hasEnoughUpPromotingUserLevelSum,
+        hasEnoughUpPromoterRatio: hasEnoughUpPromoterRatio,
+        //hasLessThanAllowedDownPromotingUserLevelSum: hasLessThanAllowedDownPromotingUserLevelSum,
+        hasLessThanAllowedDownPromoterCount: hasLessThanAllowedDownPromoterCount
+
+      });
+        
+    };
+
+    services.canAutoVerifyQuestion = function(){
+
+      var approverCount = 0;
+      var approvingUserLevelSum = 0;
+      var disapproverCount = 0;
+      var disapprovingUserLevelSum = 0;
+
+      services.question.approvedBy.forEach(function(approver){
+        approverCount += 1;
+        approvingUserLevelSum += approver.userLevel;
+      });
+
+      services.question.disapprovedBy.forEach(function(disapprover){
+        disapproverCount += 1;
+        disapprovingUserLevelSum += disapprover.userLevel;
+      });
+
+      var myRules = rules.automaticActions.autoVerfyQuestion;
+
+      var hasEnoughApproverCount = (approverCount >= myRules.minApproverCount);
+      var hasEnoughApprovingUserLevelSum = (approvingUserLevelSum >= myRules.minApprovingUserLevelSum);
+      var hasEnoughApprovingUserLevelRatio = (disapprovingUserLevelSum * myRules.minApprovingUserLevelRatio <= approvingUserLevelSum);
+      var hasLessThanAllowedDisapprovingUserLevelSum = (disapprovingUserLevelSum <= myRules.maxDisapprovingUserLevelSum);
+      var hasLessThanAllowedDisapproverCount = (disapproverCount <= myRules.maxDisapproverCount);
+     
+      return myRules.canBeDone({
+
+        hasEnoughApproverCount: hasEnoughApproverCount,
+        hasEnoughApprovingUserLevelSum: hasEnoughApprovingUserLevelSum,
+        hasEnoughApprovingUserLevelRatio: hasEnoughApprovingUserLevelRatio,
+        hasLessThanAllowedDisapprovingUserLevelSum: hasLessThanAllowedDisapprovingUserLevelSum,
+        hasLessThanAllowedDisapproverCount: hasLessThanAllowedDisapproverCount
+
+      });
+        
+    };
+
+    services.canAutoRemoveQuestion = function(){
+
+      var approverCount = 0;
+      var approvingUserLevelSum = 0;
+      var disapproverCount = 0;
+      var disapprovingUserLevelSum = 0;
+
+      services.question.approvedBy.forEach(function(approver){
+        approverCount += 1;
+        approvingUserLevelSum += approver.userLevel;
+      });
+
+      services.question.disapprovedBy.forEach(function(disapprover){
+        disapproverCount += 1;
+        disapprovingUserLevelSum += disapprover.userLevel;
+      });
+
+      var myRules = rules.automaticActions.autoRemoveQuestion;
+
+      var hasEnoughDisapproverCount = (disapproverCount >= myRules.minDisapproverCount);
+      var hasEnoughDisapprovingUserLevelSum = (disapprovingUserLevelSum >= myRules.minDisapprovingUserLevelSum);
+      var hasEnoughDisapprovingUserLevelRatio = (approvingUserLevelSum * myRules.minDisapprovingUserLevelRatio <= disapprovingUserLevelSum);
+      var hasLessThanAllowedApprovingUserLevelSum = (approvingUserLevelSum <= myRules.maxApprovingUserLevelSum);
+      var hasLessThanAllowedApproverCount = (approverCount <= myRules.maxApproverCount);
+     
+      return myRules.canBeDone({
+
+        hasEnoughDisapproverCount: hasEnoughDisapproverCount,
+        hasEnoughDisapprovingUserLevelSum: hasEnoughDisapprovingUserLevelSum,
+        hasEnoughDisapprovingUserLevelRatio: hasEnoughDisapprovingUserLevelRatio,
+        hasLessThanAllowedApprovingUserLevelSum: hasLessThanAllowedApprovingUserLevelSum,
+        hasLessThanAllowedApproverCount: hasLessThanAllowedApproverCount
+
+      });
+        
     };
 
   };

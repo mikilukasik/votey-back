@@ -7,8 +7,7 @@ var rules = {
   //  5 - 9.9 : admin
   //  10      : developer
 
-  shortenedQuestionBodyLength : 150,      //max number of characters of question body that can be displayed on a card (list)
-
+  shortenedQuestionBodyLength: 150, //max number of characters of question body that can be displayed on a card (list)
 
   menuItems: {
 
@@ -48,7 +47,7 @@ var rules = {
 
         cost: 0,
         earn: 5,
-        minNeeded: 10
+        minNeeded: 0
 
       },
 
@@ -67,16 +66,18 @@ var rules = {
 
       canIDo: function(services) {
 
-        return services.not.alreadyApprovedThisQuestion() 
-          && services.not.alreadyDisapprovedThisQuestion() 
-          && services.hasEnoughCredit() 
-          && services.hasEnoughUserLevel();
+        return services.not.alreadyApprovedThisQuestion() &&
+          services.not.alreadyDisapprovedThisQuestion() &&
+          services.hasEnoughCredit() &&
+          services.hasEnoughUserLevel();
       },
 
       whatToDo: function(services) {
 
         services.approveQuestion();
         services.adjustUserCredit();
+
+        if( services.canAutoVerifyQuestion() ) services.verifyQuestion();
 
       },
 
@@ -88,7 +89,7 @@ var rules = {
 
       successResponseBuilder: function(services) {
         return {
-          toast: undefined,//undefined,//services.getSuccessMessagesStr(),
+          toast: undefined, //undefined,//services.getSuccessMessagesStr(),
           data: undefined
         };
       },
@@ -115,7 +116,7 @@ var rules = {
 
         cost: 0,
         earn: 5,
-        minNeeded: 10
+        minNeeded: 0
 
       },
 
@@ -134,10 +135,10 @@ var rules = {
 
       canIDo: function(services) {
 
-        return services.not.alreadyApprovedThisQuestion() 
-          && services.not.alreadyDisapprovedThisQuestion() 
-          && services.hasEnoughCredit()
-          && services.hasEnoughUserLevel();
+        return services.not.alreadyApprovedThisQuestion() &&
+          services.not.alreadyDisapprovedThisQuestion() &&
+          services.hasEnoughCredit() &&
+          services.hasEnoughUserLevel();
 
       },
 
@@ -145,6 +146,8 @@ var rules = {
 
         services.disapproveQuestion();
         services.adjustUserCredit();
+
+        if( services.canAutoRemoveQuestion() ) services.markQuestionAsInappropriate();
 
       },
 
@@ -156,7 +159,7 @@ var rules = {
 
       successResponseBuilder: function(services) {
         return {
-          toast: undefined,//undefined,//services.getSuccessMessagesStr(),
+          toast: undefined, //undefined,//services.getSuccessMessagesStr(),
           data: undefined
         };
       },
@@ -169,8 +172,6 @@ var rules = {
       }
 
     },
-
-
 
     voteYes: {
 
@@ -204,10 +205,10 @@ var rules = {
 
       canIDo: function(services) {
 
-        return services.not.alreadyVotedYes() 
-          && services.questionIsVotable() 
-          && services.hasEnoughCredit() 
-          && services.hasEnoughUserLevel();
+        return services.not.alreadyVotedYes() &&
+          services.questionIsVotable() &&
+          services.hasEnoughCredit() &&
+          services.hasEnoughUserLevel();
 
       },
 
@@ -226,7 +227,7 @@ var rules = {
 
       successResponseBuilder: function(services) {
         return {
-          toast: undefined,//undefined,//services.getSuccessMessagesStr(),
+          toast: undefined, //undefined,//services.getSuccessMessagesStr(),
           data: undefined
         };
       },
@@ -272,10 +273,10 @@ var rules = {
 
       canIDo: function(services) {
 
-        return services.not.alreadyVotedNo() 
-          && services.questionIsVotable()
-          && services.hasEnoughCredit() 
-          && services.hasEnoughUserLevel();
+        return services.not.alreadyVotedNo() &&
+          services.questionIsVotable() &&
+          services.hasEnoughCredit() &&
+          services.hasEnoughUserLevel();
       },
 
       whatToDo: function(services) {
@@ -293,7 +294,7 @@ var rules = {
 
       successResponseBuilder: function(services) {
         return {
-          toast: undefined,//services.getSuccessMessagesStr(),
+          toast: undefined, //services.getSuccessMessagesStr(),
           data: undefined
         };
       },
@@ -339,16 +340,19 @@ var rules = {
 
       canIDo: function(services) {
 
-        return services.not.alreadyPromotedUp() 
-          && services.not.questionIsVotable() // && services.hasEnoughCredit.toPromote.up() && services.hasEnoughUserLevel.toPromote.up()
-          && services.hasEnoughCredit() 
-          && services.hasEnoughUserLevel();
+        return services.not.alreadyPromotedUp() &&
+          services.not.questionIsVotable() // && services.hasEnoughCredit.toPromote.up() && services.hasEnoughUserLevel.toPromote.up()
+          &&
+          services.hasEnoughCredit() &&
+          services.hasEnoughUserLevel();
       },
 
       whatToDo: function(services) {
 
         services.registerUpPromotion();
         services.adjustUserCredit();
+
+        if( services.canAutoEscalateQuestion() ) services.escalateQuestion();
 
       },
 
@@ -360,7 +364,7 @@ var rules = {
 
       successResponseBuilder: function(services) {
         return {
-          toast: undefined,//services.getSuccessMessagesStr(),
+          toast: undefined, //services.getSuccessMessagesStr(),
           data: undefined
         };
       },
@@ -406,10 +410,11 @@ var rules = {
 
       canIDo: function(services) {
 
-        return services.not.alreadyPromotedDown() 
-          && services.not.questionIsVotable() // && services.hasEnoughCredit.toPromote.up() && services.hasEnoughUserLevel.toPromote.up()
-          && services.hasEnoughCredit() 
-          && services.hasEnoughUserLevel();
+        return services.not.alreadyPromotedDown() &&
+          services.not.questionIsVotable() // && services.hasEnoughCredit.toPromote.up() && services.hasEnoughUserLevel.toPromote.up()
+          &&
+          services.hasEnoughCredit() &&
+          services.hasEnoughUserLevel();
       },
 
       whatToDo: function(services) {
@@ -427,7 +432,7 @@ var rules = {
 
       successResponseBuilder: function(services) {
         return {
-          toast: undefined,//services.getSuccessMessagesStr(),
+          toast: undefined, //services.getSuccessMessagesStr(),
           data: undefined
         };
       },
@@ -476,8 +481,9 @@ var rules = {
       canIDo: function(services) {
 
         return services.not.questionHeaderExists() //services.hasEnoughCredit() && services.hasEnoughUserLevel()
-          && services.hasEnoughCredit() 
-          && services.hasEnoughUserLevel()
+          &&
+          services.hasEnoughCredit() &&
+          services.hasEnoughUserLevel()
       },
 
       whatToDo: function(services) {
@@ -516,7 +522,7 @@ var rules = {
         action: 'postNewComment'
       },
 
-      minUserLevel: 2, 
+      minUserLevel: 2,
 
       credit: {
 
@@ -542,8 +548,8 @@ var rules = {
 
       canIDo: function(services) {
 
-        return services.hasEnoughCredit() 
-          && services.hasEnoughUserLevel();
+        return services.hasEnoughCredit() &&
+          services.hasEnoughUserLevel();
 
       },
 
@@ -563,7 +569,7 @@ var rules = {
 
       successResponseBuilder: function(services) {
         return {
-          toast: undefined,//services.getSuccessMessagesStr(),
+          toast: undefined, //services.getSuccessMessagesStr(),
           data: undefined
         };
       },
@@ -584,7 +590,7 @@ var rules = {
         action: 'deleteComment'
       },
 
-      minUserLevel: 0, 
+      minUserLevel: 0,
 
       credit: {
 
@@ -610,8 +616,8 @@ var rules = {
 
       canIDo: function(services) {
 
-        return services.hasEnoughCredit() 
-          && services.hasEnoughUserLevel(); //services.not.questionHeaderExists() //services.hasEnoughCredit() && services.hasEnoughUserLevel()
+        return services.hasEnoughCredit() &&
+          services.hasEnoughUserLevel(); //services.not.questionHeaderExists() //services.hasEnoughCredit() && services.hasEnoughUserLevel()
 
       },
 
@@ -629,7 +635,7 @@ var rules = {
 
       successResponseBuilder: function(services) {
         return {
-          toast: undefined,//services.getSuccessMessagesStr(),
+          toast: undefined, //services.getSuccessMessagesStr(),
           data: undefined
         };
       },
@@ -643,7 +649,6 @@ var rules = {
 
     },
 
-
     updateComment: {
 
       name: {
@@ -651,7 +656,7 @@ var rules = {
         action: 'updateComment'
       },
 
-      minUserLevel: 0, 
+      minUserLevel: 0,
 
       credit: {
 
@@ -678,9 +683,7 @@ var rules = {
 
       canIDo: function(services) {
 
-
-
-        return true;//services.not.alreadyReportedComment()  ;//true;//services.not.questionHeaderExists() //services.hasEnoughCredit() && services.hasEnoughUserLevel()
+        return true; //services.not.alreadyReportedComment()  ;//true;//services.not.questionHeaderExists() //services.hasEnoughCredit() && services.hasEnoughUserLevel()
 
       },
 
@@ -698,7 +701,7 @@ var rules = {
 
       successResponseBuilder: function(services) {
         return {
-          toast: undefined,//services.getSuccessMessagesStr(),
+          toast: undefined, //services.getSuccessMessagesStr(),
           data: undefined
         };
       },
@@ -712,7 +715,6 @@ var rules = {
 
     },
 
-
     reportComment: {
 
       name: {
@@ -720,7 +722,7 @@ var rules = {
         action: 'reportComment'
       },
 
-      minUserLevel: 0, 
+      minUserLevel: 0,
 
       credit: {
 
@@ -746,7 +748,7 @@ var rules = {
 
       canIDo: function(services) {
 
-        return services.not.alreadyReportedComment();//true;//services.not.questionHeaderExists() //services.hasEnoughCredit() && services.hasEnoughUserLevel()
+        return services.not.alreadyReportedComment(); //true;//services.not.questionHeaderExists() //services.hasEnoughCredit() && services.hasEnoughUserLevel()
 
       },
 
@@ -764,7 +766,7 @@ var rules = {
 
       successResponseBuilder: function(services) {
         return {
-          toast: undefined,//services.getSuccessMessagesStr(),
+          toast: undefined, //services.getSuccessMessagesStr(),
           data: undefined
         };
       },
@@ -785,7 +787,7 @@ var rules = {
         action: 'approveComment'
       },
 
-      minUserLevel: 0, 
+      minUserLevel: 0,
 
       credit: {
 
@@ -811,7 +813,7 @@ var rules = {
 
       canIDo: function(services) {
 
-        return services.not.alreadyApprovedComment() && services.not.alreadyDisapprovedComment();//true;//services.not.questionHeaderExists() //services.hasEnoughCredit() && services.hasEnoughUserLevel()
+        return services.not.alreadyApprovedComment() && services.not.alreadyDisapprovedComment(); //true;//services.not.questionHeaderExists() //services.hasEnoughCredit() && services.hasEnoughUserLevel()
 
       },
 
@@ -819,6 +821,8 @@ var rules = {
 
         services.approveCommentOnQuestion();
         services.adjustUserCredit();
+
+        if (services.canAutoVerfyComment()) services.verifyComment();
 
       },
 
@@ -830,7 +834,7 @@ var rules = {
 
       successResponseBuilder: function(services) {
         return {
-          toast: undefined,//services.getSuccessMessagesStr(),
+          toast: undefined, //services.getSuccessMessagesStr(),
           data: undefined
         };
       },
@@ -851,7 +855,7 @@ var rules = {
         action: 'disapproveComment'
       },
 
-      minUserLevel: 0, 
+      minUserLevel: 0,
 
       credit: {
 
@@ -876,15 +880,22 @@ var rules = {
       },
 
       canIDo: function(services) {
-        
-        return services.not.alreadyApprovedComment() && services.not.alreadyDisapprovedComment();//true;//services.not.questionHeaderExists() //services.hasEnoughCredit() && services.hasEnoughUserLevel()
+
+        return services.not.alreadyApprovedComment() && services.not.alreadyDisapprovedComment(); //true;//services.not.questionHeaderExists() //services.hasEnoughCredit() && services.hasEnoughUserLevel()
 
       },
 
       whatToDo: function(services) {
-        
+
         services.disapproveCommentOnQuestion();
         services.adjustUserCredit();
+
+        if (services.canAutoRemoveComment()) {
+
+          //services.saveCommentInAbusiveCommentCollection();
+          services.removeCommentFromQuestion();
+
+        }
 
       },
 
@@ -896,7 +907,7 @@ var rules = {
 
       successResponseBuilder: function(services) {
         return {
-          toast: undefined,//services.getSuccessMessagesStr(),
+          toast: undefined, //services.getSuccessMessagesStr(),
           data: undefined
         };
       },
@@ -917,7 +928,7 @@ var rules = {
         action: 'reportQuestion'
       },
 
-      minUserLevel: 0, 
+      minUserLevel: 0,
 
       credit: {
 
@@ -942,9 +953,7 @@ var rules = {
 
       canIDo: function(services) {
 
-
-
-        return services.not.alreadyReportedQuestion();//true;//services.not.questionHeaderExists() //services.hasEnoughCredit() && services.hasEnoughUserLevel()
+        return services.not.alreadyReportedQuestion(); //true;//services.not.questionHeaderExists() //services.hasEnoughCredit() && services.hasEnoughUserLevel()
 
       },
 
@@ -962,7 +971,7 @@ var rules = {
 
       successResponseBuilder: function(services) {
         return {
-          toast: undefined,//services.getSuccessMessagesStr(),
+          toast: undefined, //services.getSuccessMessagesStr(),
           data: undefined
         };
       },
@@ -975,7 +984,6 @@ var rules = {
       }
 
     },
-
 
     removeQuestion: {
 
@@ -1094,7 +1102,8 @@ var rules = {
       loaderAsync: function(services) {
         return [
           services.loadQuestionList({
-            votable: true
+            votable: true,
+            inappropriate: false
           }),
           services.loadClient()
         ]
@@ -1130,7 +1139,6 @@ var rules = {
         };
       }
 
-
     },
 
     getQuestionsToReview: {
@@ -1157,7 +1165,14 @@ var rules = {
       loaderAsync: function(services) {
         return [
           services.loadQuestionList({
-            reportedBy: { $exists: true, $not: {$size: 0} }
+            inappropriate: false,
+            verified: false,
+            reportedBy: {
+              $exists: true,
+              $not: {
+                $size: 0
+              }
+            }
           })
           //,services.loadClient()
         ]
@@ -1168,11 +1183,11 @@ var rules = {
       },
 
       whatToDo: function(services) {
-        
+
         services.removeQuestionsIApproved();
         services.removeQuestionsIDisapproved();
         services.sortQuestionsByNumberOfReports();
-        
+
       },
 
       successPostFlightAsync: function(services) {
@@ -1192,7 +1207,6 @@ var rules = {
           data: undefined
         };
       }
-
 
     },
 
@@ -1220,7 +1234,8 @@ var rules = {
       loaderAsync: function(services) {
         return [
           services.loadQuestionListWithComments({
-            hasReportedCommets: true
+            hasReportedCommets: true,
+            inappropriate: false
           })
           //,services.loadClient()
         ]
@@ -1232,7 +1247,7 @@ var rules = {
 
       whatToDo: function(services) {
         services.buildReportedCommentsList();
-        
+
         services.removeReportedCommentsIApproved();
         services.removeReportedCommentsIDisapproved();
 
@@ -1256,7 +1271,6 @@ var rules = {
           data: undefined
         };
       }
-
 
     },
 
@@ -1284,7 +1298,8 @@ var rules = {
       loaderAsync: function(services) {
         return [
           services.loadQuestionList({
-            votable: false
+            votable: false,
+            inappropriate: false
           }),
           services.loadClient()
         ]
@@ -1499,10 +1514,131 @@ var rules = {
 
   automaticActions: {
 
-    makeQuestionVotable: {
-      minTotalPromotionNeeded: 20,
-      //  adminApprovalNeeded: false,
-      //  communityApprovalNeeded: true
+    autoVerfyComment: {
+
+      name: {
+        type: 'automaticActions',
+        action: 'autoVerfyComment'
+      },
+
+      minApprovingUserLevelSum: 5,
+      minApprovingUserLevelRatio: 2,
+      minApproverCount: 2,
+      maxDisapproverCount: 2,
+      maxDisapprovingUserLevelSum: 10,
+
+      canBeDone: function(bools) {
+
+        return bools.hasEnoughApproverCount &&
+          bools.hasEnoughApprovingUserLevelSum &&
+          bools.hasEnoughApprovingUserLevelRatio &&
+          bools.hasLessThanAllowedDisapprovingUserLevelSum &&
+          bools.hasLessThanAllowedDisapproverCount;
+
+      }
+
+    },
+
+    autoRemoveComment: {
+
+      name: {
+        type: 'automaticActions',
+        action: 'autoRemoveComment'
+      },
+
+      minDisapprovingUserLevelSum: 5,
+      minDisapprovingUserLevelRatio: 2,
+      minDisapproverCount: 2,
+      maxApproverCount: 2,
+      maxApprovingUserLevelSum: 10,
+
+      canBeDone: function(bools) {
+
+        return bools.hasEnoughDisapproverCount &&
+          bools.hasEnoughDisapprovingUserLevelSum &&
+          bools.hasEnoughDisapprovingUserLevelRatio &&
+          bools.hasLessThanAllowedApprovingUserLevelSum &&
+          bools.hasLessThanAllowedApproverCount;
+
+      }
+
+    },
+
+    autoVerfyQuestion: {
+
+      name: {
+        type: 'automaticActions',
+        action: 'autoVerfyQuestion'
+      },
+
+      minApprovingUserLevelSum: 2,
+      minApprovingUserLevelRatio: 2,
+      minApproverCount: 2,
+      maxDisapproverCount: 2,
+      maxDisapprovingUserLevelSum: 10,
+
+      canBeDone: function(bools) {
+
+        return bools.hasEnoughApproverCount &&
+          bools.hasEnoughApprovingUserLevelSum &&
+          bools.hasEnoughApprovingUserLevelRatio &&
+          bools.hasLessThanAllowedDisapprovingUserLevelSum &&
+          bools.hasLessThanAllowedDisapproverCount;
+
+      }
+
+    },
+
+    autoRemoveQuestion: {
+
+      name: {
+        type: 'automaticActions',
+        action: 'autoRemoveQuestion'
+      },
+
+      minDisapprovingUserLevelSum: 2,
+      minDisapprovingUserLevelRatio: 2,
+      minDisapproverCount: 2,
+      maxApproverCount: 2,
+      maxApprovingUserLevelSum: 10,
+
+      canBeDone: function(bools) {
+
+        return bools.hasEnoughDisapproverCount &&
+          bools.hasEnoughDisapprovingUserLevelSum &&
+          bools.hasEnoughDisapprovingUserLevelRatio &&
+          bools.hasLessThanAllowedApprovingUserLevelSum &&
+          bools.hasLessThanAllowedApproverCount;
+
+      }
+
+    },
+
+    autoEscalateQuestion: {
+
+      name: {
+        type: 'automaticActions',
+        action: 'autoEscalateQuestion'
+      },
+
+      //minUpPromotingUserLevelSum: 10,
+      minUpPromoterRatio: 2,
+      minUpPromoterCount: 3,
+
+      maxDownPromoterCount: 50,   //TODO: need event when question passes this limit, will never be escalated 
+
+      //maxDownPromotingUserLevelSum: 100, //TODO: need event when question passes this limit, will never be escalated 
+
+      canBeDone: function(bools) {
+
+        return bools.hasEnoughUpPromoterCount &&
+          //bools.hasEnoughUpPromotingUserLevelSum &&
+          bools.hasEnoughUpPromoterRatio &&
+          // bools.hasLessThanAllowedDownPromotingUserLevelSum &&
+          bools.hasLessThanAllowedDownPromoterCount;
+
+      }
+
     }
 
   }

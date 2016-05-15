@@ -79,7 +79,6 @@ var exporter = function(cn) {
         getDb().then(function(db){
           db.collection(collectionName).save(doc,function(err,item){
             if(err) return reject(err);
-            console.log('savoooooooooooo',doc)
             return resolve(doc);
           })
         },function(err){
