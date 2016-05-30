@@ -95,6 +95,7 @@ var exporter = function(libs) {
         db.findOne('questions', {
           _id: new db.ObjectID(services.questionId)
         }).then(function(questionDoc) {
+          if(!questionDoc) return reject('Question not found.');
           services.question = questionDoc;
           return resolve(questionDoc);
         }, function(err) {
