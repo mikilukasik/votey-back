@@ -534,6 +534,10 @@ var exporter = function(libs) {
     services.addIdToNewComment = function() {
       services.newComment.id = new db.ObjectID();
     };
+    
+    services.addAddedByToComment = function () {
+      services.newComment.addedBy = services.clientMongoId;
+    };
 
     services.addNewCommentToQuestion = function() {
       services.question.comments.push(services.newComment);
@@ -663,6 +667,14 @@ var exporter = function(libs) {
           if (services.question.comments[i].reportedBy[j].clientMongoId == services.clientMongoId) shouldRemove = true;
         };
         if (shouldRemove) services.question.comments.splice(i, 1);
+      };
+    };
+    
+    services.markMyCommentsAndRemoveAddedBys = function() {
+      var i = services.question.comments.length;
+      while (i--) {
+        if(services.question.comments[i].addedBy == services.clientMongoId) services.question.comments[i].isMine = true;
+        services.question.comments[i].addedBy = undefined;
       };
     };
 
@@ -912,6 +924,11 @@ var exporter = function(libs) {
         return previousPromotion.questionId == question._id
       });
       if (myPreviousPromotionForThisQuestion) question.previousPromotion = (myPreviousPromotionForThisQuestion.promoting) ? 'up' : 'down';
+    };
+    
+    services.markQuestionIfIsMineAndRemovePoestedBy = function() {
+      if(services.question.postedBy == services.clientMongoId) services.question.isMine = true;
+      services.question.postedBy = undefined;
     };
 
     services.addMyVotesToQuestionList = function() {
