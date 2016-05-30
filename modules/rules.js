@@ -556,6 +556,7 @@ var rules = {
       whatToDo: function(services) {
 
         services.addIdToNewComment();
+        services.addAddedByToComment();
         services.addNewCommentToQuestion();
         services.adjustUserCredit();
 
@@ -1374,7 +1375,9 @@ var rules = {
       whatToDo: function(services) {
         services.addMyPreviousVoteToQuestionInParam(services.question);
         services.addMyPreviousPromotionToQuestionInParam(services.question);
+        services.markQuestionIfIsMineAndRemovePoestedBy();
         services.filterOutCommentsIReported();
+        services.markMyCommentsAndRemoveAddedBys();
       },
 
       successPostFlightAsync: function(services) {
