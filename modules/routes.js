@@ -167,7 +167,7 @@ module.exports = function(router, app, libs) {
       res.json(resJson);
     });
   });
-  router.route('/questions/:questionId/comments/:commentId').delete(function(req, res) {
+  router.route('/questions/:questionId/comments/:commentId').delete(authorise, function(req, res) {
     dealWithUserAction({
       role: 'general',
       cmd: 'dealWithUserAction',
