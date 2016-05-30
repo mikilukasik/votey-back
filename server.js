@@ -61,7 +61,8 @@ var libs = {
 	bcrypt: bcrypt,
 	CanIDoServices: CanIDoServices,
 	rules: rules,
-	classes: classes
+	classes: classes,
+	seneca: seneca
 }
 
 seneca.use('./modules/sen.loginActions.js', libs);

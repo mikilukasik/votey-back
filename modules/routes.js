@@ -3,6 +3,7 @@ module.exports = function(router, app, libs) {
   var dealWithUserAction = libs.dealWithUserAction;
   var db = libs.db;
   var classes = libs.classes;
+  var seneca = libs.seneca;
   
   var dealWithError = function (err, res){
     res && res.status(500).json({
@@ -386,22 +387,41 @@ module.exports = function(router, app, libs) {
             hardwareId: hardwareId,
             
           })).then(function(myNewRecord) {
+            seneca.act({
+            role: 'jwt',
+            cmd:  'create',
+            clientMongoId: myNewRecord._id
+          }, function (senError, senResult) {
+            if(senError) return dealWithError(senError, res);
+            
             res.json({
-              clientMongoId: myNewRecord._id
-            })
-          }, function(err) {
-            console.log('route ERROR when saving to db, GET /client-mongo-id/:hardwareId', err);
-            res.status(500).json({
-              error: 'route ERROR, GET /client-mongo-id/' + hardwareId,
-              details: err,
-              req: req.params
+              clientMongoId: myNewRecord._id,
+              authToken: senResult
             });
+            
+          })
+          }, function(err) {
+            return dealWithError(err, res);
           })
         } else {
           //known client
-          res.json({
+          
+          seneca.act({
+            role: 'jwt',
+            cmd:  'create',
             clientMongoId: myRecord._id
+          }, function (senError, senResult) {
+            if(senError) return dealWithError(senError, res);
+            
+            res.json({
+              clientMongoId: myRecord._id,
+              authToken: senResult
+            });
+            
           })
+          
+          
+          
         }
       }, function(err) {
         console.log('route ERROR when reading from db, GET /client-mongo-id/:hardwareId', err);
