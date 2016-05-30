@@ -53,7 +53,7 @@ var CanIDoServices = require('./modules/canIDoServices.js')({
 	classes: classes
 })
 
-
+var jwt = require('jsonwebtoken')
 
 var libs = {
 	db: db,

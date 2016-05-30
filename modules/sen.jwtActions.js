@@ -7,6 +7,8 @@ module.exports = function(libs) {
 //   var bcrypt = libs.bcrypt;
 //   var classes= libs.classes; 
 
+var jwt = libs.jwt;
+
   var seneca = this;
 
   seneca.add({
@@ -22,7 +24,15 @@ module.exports = function(libs) {
 
   function create(args, done) {
 
+    var clientMongoId = args.clientMongoId;
+    
+    var token = jwt.sign(clientMongoId, 'superSecret', {
+      expiresInMinutes: 15
+    });
 
+    done(null, {
+      token: token
+    })
 
   };
 
