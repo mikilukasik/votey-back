@@ -1,3 +1,6 @@
+//TODO: throw
+
+
 module.exports = function(libs) {
 
   var db = libs.db;
@@ -33,7 +36,10 @@ module.exports = function(libs) {
 
             cb(null, services.buildSuccessResponse());
 
-          }, function(saveErr) {
+          }, 
+
+
+          function(saveErr) {
             //error in logic?
 
             console.log('ERROR: some error in logic(?), canIdo true, but error in doAndSaveData: ', saveErr);
@@ -63,9 +69,9 @@ module.exports = function(libs) {
           error: true
         });
 
-      })
+      });
 
   };
 
 
-}
+};

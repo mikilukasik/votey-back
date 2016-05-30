@@ -1,7 +1,9 @@
+//TODO: refaktor this file!!
+
 var express = require('express');
 var morgan = require('morgan');
 var bodyParser = require("body-parser");
-var fs = require('fs');
+//var fs = require('fs');
 
 var _ = require('lodash')
 
@@ -20,7 +22,6 @@ var CanIDoServices = require('./modules/canIDoServices.js')({
 	_: _,
 	db: db
 })
-
 
 
 
@@ -67,19 +68,9 @@ seneca.use('./modules/sen.loginActions.js', libs);
 //seneca.use('./modules/sen.dealWithUserAction.js', libs);
 
 
-var dealWithUserAction = require('./modules/dealWithUserAction.js')(libs);
+libs.dealWithUserAction = require('./modules/dealWithUserAction.js')(libs);
 
-
-//seneca.use('./modules/sen.questionActions.js', libs);
-//seneca.use('./modules/idActions.js', libs);
-
-
-
-eval(fs.readFileSync('./modules/routes.js') + '');
-
-
-
-initRouter(router,app);
+require('./modules/routes.js')(router,app,libs);
 
 
 var server = httpServ.listen(5000, function() {
@@ -89,5 +80,4 @@ var server = httpServ.listen(5000, function() {
 		.port;
 	console.log('server.js started, listening at http://%s:%s', host, port);
 });
-
 
