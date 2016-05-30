@@ -42,7 +42,7 @@ app.use(morgan("combined"))
 
 var router = express.Router()
 
-//var seneca = require('seneca')();
+var seneca = require('seneca')();
 
 var classes = require('./modules/classes.js');
 
