@@ -66,6 +66,8 @@ var libs = {
 seneca.use('./modules/sen.loginActions.js', libs);
 //seneca.use('./modules/sen.dealWithUserAction.js', libs);
 
+seneca.use('./modules/sen.jwtActions.js', libs);
+
 
 var dealWithUserAction = require('./modules/dealWithUserAction.js')(libs);
 
