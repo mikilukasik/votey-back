@@ -16,7 +16,7 @@ module.exports = function(libs) {
       return new Promise(function(resolve, reject) {
 
         var token = jwt.sign(createFrom, secret, {
-          expiresIn: 5 // 604800   //one week in seconds
+          expiresIn: 86400 * 7   //one week in seconds
         });
 
         resolve(token);
@@ -40,7 +40,11 @@ module.exports = function(libs) {
   };
 
   returnThis.refresh = function(soonExpiringToken) {
-    return returnThis.create( returnThis.unpack(soonExpiringToken) );   //returns promise
+    return returnThis.unpack(soonExpiringToken)
+      .then(function (decoded) {
+        decoded.exp = undefined;
+        return returnThis.create(decoded);
+      });
   };
 
   return returnThis;

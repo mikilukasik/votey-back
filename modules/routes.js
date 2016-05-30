@@ -378,27 +378,42 @@ module.exports = function(router, app, libs) {
       dealWithError(err, res);
     })
   });
-  router.route('/client-mongo-id/:clientMongoId').post(authorise, function(req, res) {
-    //TODO: i think this never gets called
-    var objId = new db.ObjectID(req.params.clientMongoId);
-    db.findOne('clients', {
-      _id: objId
-    }, function(myRecord) { //update in cb and save after
-      if (!myRecord) {
-        db.save('clients', new classes.Client({
-          _id: objId
-        })).then(function(myNewRecord) {
-          res.json({
-            clientMongoId: myNewRecord._id
-          })
-        })
-      } else {
-        res.json({
-          clientMongoId: myRecord._id
-        })
-      }
+  
+  router.route('/refresh-token/:authToken').get(function(req, res) {
+    
+   tokens.refresh( req.get('authToken') )
+    .then(function(newToken){
+      res.json({
+        authToken: newToken
+      });
+    }, function(err){
+      dealWithError(err, res);
     })
+   
   });
+  
+  
+  // router.route('/client-mongo-id/:clientMongoId').post(authorise, function(req, res) {
+  //   //TODO: i think this never gets called
+  //   var objId = new db.ObjectID(req.params.clientMongoId);
+  //   db.findOne('clients', {
+  //     _id: objId
+  //   }, function(myRecord) { //update in cb and save after
+  //     if (!myRecord) {
+  //       db.save('clients', new classes.Client({
+  //         _id: objId
+  //       })).then(function(myNewRecord) {
+  //         res.json({
+  //           clientMongoId: myNewRecord._id
+  //         })
+  //       })
+  //     } else {
+  //       res.json({
+  //         clientMongoId: myRecord._id
+  //       })
+  //     }
+  //   })
+  // });
   router.use('/*', function(err, req, res, next) {
     console.log(err, err.message);
     dealWithError(err, res);
