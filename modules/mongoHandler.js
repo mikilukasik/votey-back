@@ -12,19 +12,15 @@ var exporter = function(cn) {
     
     dbService.connectToDb = function() {
       return new Promise(function(resolve, reject){
-        console.log('mongoHandler is onnecting to db, connectionString: ', connectionString);
+        console.log('mongoHandler is connecting to db, connectionString: ', connectionString);
 
         mongodb.connect(connectionString, function(gotErr, gotDb) {
-          if (gotErr) {
-            console.log('connectToDb ERROR: ', gotErr);
-            return reject(gotErr);
-            console.log('this should never ever run!!!');
-          }
+          if (gotErr) return reject(gotErr);
+          
           console.log('CONNECTED TO DB ON', connectionString);
           connectedDb = gotDb;
           return resolve(gotDb);
-          console.log('this should never ever run!!!');
-
+          
         });
       });
     };
@@ -97,6 +93,8 @@ var exporter = function(cn) {
               cb(doc);
               dbService.save(collectionName,doc).then(function(savedDoc){
                 return resolve(doc);
+              }, function(err){
+                return reject(err);
               });
             };
             return resolve(doc);
