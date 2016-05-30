@@ -334,7 +334,6 @@ module.exports = function(router, app, libs) {
             
             tokens.create({ clientMongoId: myNewRecord._id }).then(function(authToken) {
               res.json({
-                //clientMongoId: myNewRecord._id,
                 authToken: authToken
               });
               
@@ -346,7 +345,7 @@ module.exports = function(router, app, libs) {
           })
         } else {
           //known client
-          tokens.create({ clientMongoId: myNewRecord._id }).then(function(authToken) {
+          tokens.create({ clientMongoId: myRecord._id }).then(function(authToken) {
               res.json({
                 //clientMongoId: myNewRecord._id,
                 authToken: authToken
