@@ -1184,7 +1184,7 @@ var exporter = function(libs) {
 
     var newServices = new CanIDoServices({
 
-      clientMongoId: params.req.get('clientMongoId'),
+      clientMongoId: params.req.clientMongoId,
       desiredAction: params.desiredAction,
 
       req: params.req,

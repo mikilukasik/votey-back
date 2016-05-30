@@ -16,30 +16,32 @@ var jwt = libs.jwt;
     cmd: 'create'
   }, create);
 
-  seneca.add({
-    role: 'jwt',
-    cmd: 'unpack'
-  }, unpack);
+  // seneca.add({
+  //   role: 'jwt',
+  //   cmd: 'unpack'
+  // }, unpack);
+  
+  
   //... other action definitions
 
   function create(args, done) {
 
     var clientMongoId = args.clientMongoId;
     
-    var token = jwt.sign(clientMongoId, 'superSecret', {
-      expiresInMinutes: 15
-    });
+    // var token = jwt.sign(clientMongoId, 'superSecret', {
+    //   expiresInMinutes: 15
+    // });
 
-    done(null, {
-      token: token
-    })
+    // done(null, {
+    //   token: token
+    // })
 
   };
 
-  function unpack(args, done) {
+  // function unpack(args, done) {
    
 
 
-  };
+  // };
 
 };

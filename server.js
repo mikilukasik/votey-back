@@ -62,16 +62,19 @@ var libs = {
 	CanIDoServices: CanIDoServices,
 	rules: rules,
 	classes: classes,
-	seneca: seneca
+	//seneca: seneca
 }
 
 seneca.use('./modules/sen.loginActions.js', libs);
 //seneca.use('./modules/sen.dealWithUserAction.js', libs);
-
-seneca.use('./modules/sen.jwtActions.js', libs);
+libs.jwt = jwt;
+var tokens = require('./modules/jwtHandler.js')(libs);
 
 
 libs.dealWithUserAction = require('./modules/dealWithUserAction.js')(libs);
+
+
+libs.tokens = tokens;
 
 require('./modules/routes.js')(router,app,libs);
 
