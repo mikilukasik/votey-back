@@ -184,9 +184,9 @@ var rules = {
 
       credit: {
 
-        cost: 10,
+        cost: 0,
         earn: 0,
-        minNeeded: 20
+        minNeeded: 0
 
       },
 
@@ -252,9 +252,9 @@ var rules = {
 
       credit: {
 
-        cost: 10,
+        cost: 0,
         earn: 0,
-        minNeeded: 20
+        minNeeded: 0
 
       },
 
