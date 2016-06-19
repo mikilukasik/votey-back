@@ -65,6 +65,37 @@ var exporter = function(libs) {
       });
     };
 
+    services.convertIdInRecordToMongoId = function() {
+      services.record._id = db.ObjectID(services.record._id);
+    }
+
+    services.loadQuery = function() { //async              
+      return new Promise(function(resolve, reject) {
+        db.query(services.collection, services.query).then(function(queryResult) {
+          services.queryResult = queryResult;
+          return resolve(services.queryResult);
+        }, function(err) {
+          return reject(err)
+        });
+      });
+    };
+
+    services.saveRecordInCollection = function() { //async              
+      return new Promise(function(resolve, reject) {
+        db.save(services.collection, services.record).then(function(savedDoc) {
+          return resolve(savedDoc);
+        }, function(err) {
+          return reject(err)
+        });
+      });
+    };
+
+
+
+    services.serveQuery = function() {
+      return services.queryResult;
+    };
+
     services.loadQuestionListWithComments = function(query) { //async              
       return new Promise(function(resolve, reject) {
         db.query('questions', query).then(function(questionList) {

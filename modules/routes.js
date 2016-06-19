@@ -45,7 +45,36 @@ module.exports = function(router, app, libs) {
         dealWithError(err, res);
       })
     });
-  ////////////////////////  login  ///////////////////////
+  ////////////////////////  admin  ///////////////////////
+  router.route('/dbQuery')
+    .post(function(req, res) {    //put here auth
+      dealWithUserAction({
+        role: 'general',
+        cmd: 'dealWithUserAction',
+        req: req,
+        res: res,
+        desiredAction: 'dbQuery'
+      }, function(err, resJson) {
+        if (err) return dealWithError(err, res);
+        res.json(resJson);
+      });
+    });
+
+    router.route('/submitDocumentChanges')
+    .post(function(req, res) {    //put here auth
+      dealWithUserAction({
+        role: 'general',
+        cmd: 'dealWithUserAction',
+        req: req,
+        res: res,
+        desiredAction: 'submitDocumentChanges'
+      }, function(err, resJson) {
+        if (err) return dealWithError(err, res);
+        res.json(resJson);
+      });
+    });
+      ////////////////////////  login  ///////////////////////
+
   router.route('/login') //register
     .post(authorise, function(req, res) {
       seneca.act({

@@ -34,6 +34,126 @@ var rules = {
 
   userActions: {
 
+    dbQuery: {
+
+      name: {
+        type: 'userActions',
+        action: 'dbQuery'
+      },
+
+      minUserLevel: 0,
+
+      credit: {
+
+        cost: 0,
+        earn: 0,
+        minNeeded: 0
+
+      },
+
+      serviceBuilder: function(req) {
+        return {
+          query: req.body.query,
+          collection: req.body.collection,
+        }
+      },
+
+      loaderAsync: function(services) {
+        return [
+          services.loadQuery()
+        ]
+      },
+
+      canIDo: function(services) {
+
+        return true;
+      },
+
+      whatToDo: function(services) {
+
+      },
+
+      successPostFlightAsync: function(services) {
+        return []
+      },
+
+      successResponseBuilder: function(services) {
+        return {
+          toast: undefined, //undefined,//services.getSuccessMessagesStr(),
+          data: services.serveQuery()
+        };
+      },
+
+      cantDoResponseBuilder: function(services) {
+        return {
+          toast: services.getCantDoMessagesStr(),
+          data: undefined
+        };
+      }
+
+    },
+
+    submitDocumentChanges: {
+
+      name: {
+        type: 'userActions',
+        action: 'submitDocumentChanges'
+      },
+
+      minUserLevel: 0,
+
+      credit: {
+
+        cost: 0,
+        earn: 0,
+        minNeeded: 0
+
+      },
+
+      serviceBuilder: function(req) {
+        return {
+          record: req.body.record,
+          collection: req.body.collection
+        }
+      },
+
+      loaderAsync: function(services) {
+        return [
+          
+        ]
+      },
+
+      canIDo: function(services) {
+
+        return true;
+      },
+
+      whatToDo: function(services) {
+        services.convertIdInRecordToMongoId();
+      },
+
+      successPostFlightAsync: function(services) {
+        return [
+          services.saveRecordInCollection()
+        ]
+      },
+
+      successResponseBuilder: function(services) {
+        return {
+          toast: undefined, //undefined,//services.getSuccessMessagesStr(),
+          data: undefined//services.serveQuery()
+        };
+      },
+
+      cantDoResponseBuilder: function(services) {
+        return {
+          toast: services.getCantDoMessagesStr(),
+          data: undefined
+        };
+      }
+
+    },
+
     approveQuestion: {
 
       name: {
