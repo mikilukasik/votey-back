@@ -83,6 +83,7 @@ var exporter = function(libs) {
     services.saveRecordInCollection = function() { //async              
       return new Promise(function(resolve, reject) {
         db.save(services.collection, services.record).then(function(savedDoc) {
+          services.savedDocId = savedDoc._id;
           return resolve(savedDoc);
         }, function(err) {
           return reject(err)
@@ -90,7 +91,9 @@ var exporter = function(libs) {
       });
     };
 
-
+    services.getSavedRecordId = function(){
+      return services.savedDocId;
+    };
 
     services.serveQuery = function() {
       return services.queryResult;
