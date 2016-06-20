@@ -69,6 +69,8 @@ module.exports = function(libs) {
           error: true
         });
 
+      }).then(function(success){}, function(err){
+        cb(err,null);
       });
 
   };
