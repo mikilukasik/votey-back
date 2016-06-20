@@ -141,7 +141,7 @@ var rules = {
       successResponseBuilder: function(services) {
         return {
           toast: undefined, //undefined,//services.getSuccessMessagesStr(),
-          data: getSavedDoc()//services.serveQuery()
+          data: services.getSavedDoc()//services.serveQuery()
         };
       },
 
