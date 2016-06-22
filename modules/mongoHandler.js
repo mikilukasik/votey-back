@@ -84,6 +84,20 @@ var exporter = function(cn) {
       });
     };
 
+    dbService.remove = function(collectionName, _id) {  
+      return new Promise(function(resolve, reject){
+        getDb().then(function(db){
+          db.collection(collectionName).remove({_id: _id},function(err,result){
+            if(err) return reject(err);
+            return resolve(result);
+          })
+        },function(err){
+          console.log('db.save ERROR: ', err);
+          return reject(err);
+        })
+      });
+    };
+
     dbService.findOne = function(collectionName, query, cb) {  
       return new Promise(function(resolve, reject){
         getDb().then(function(db){
