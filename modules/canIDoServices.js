@@ -93,7 +93,7 @@ var exporter = function(libs) {
 
     services.deleteRecordFromCollection = function() { //async              
       return new Promise(function(resolve, reject) {
-        db.save(services.collection, services.record._id).then(function(result) {
+        db.remove(services.collection, services.record._id).then(function(result) {
           
           return resolve(result);
         }, function(err) {
