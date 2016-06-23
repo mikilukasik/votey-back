@@ -109,7 +109,7 @@ var exporter = function(libs) {
       });
     };
 
-    services.multiDeleteDocuments = function() { //async  
+    services.deleteIdsRecordsFromCollection = function() { //async  
 
       var promises = [];
       services.ids.forEach(function(_id){
