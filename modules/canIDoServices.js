@@ -67,7 +67,14 @@ var exporter = function(libs) {
 
     services.convertIdInRecordToMongoId = function() {
       services.record._id = db.ObjectID(services.record._id);
-    }
+    };
+
+    services.multiConvertIdsToMongoIds = function() {
+      services.ids.forEach(function(id, index){
+        services.ids[index] = db.ObjectID(id);
+      })
+      
+    };
 
     services.loadQuery = function() { //async              
       return new Promise(function(resolve, reject) {
@@ -100,6 +107,25 @@ var exporter = function(libs) {
           return reject(err)
         });
       });
+    };
+
+    services.multiDeleteDocuments = function() { //async  
+
+      var promises = [];
+      services.ids.forEach(function(_id){
+        promises.push(new Promise(function(resolve, reject) {
+          db.remove(services.collection, _id).then(function(result) {
+            
+            return resolve(result);
+          }, function(err) {
+            return reject(err)
+          });
+        }))
+
+      })
+
+      return Promise.all(promises);
+      
     };
 
     services.getSavedDoc = function(){

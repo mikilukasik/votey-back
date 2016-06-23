@@ -215,6 +215,67 @@ var rules = {
 
     },
 
+    multiDeleteDocuments: {
+
+      name: {
+        type: 'userActions',
+        action: 'multiDeleteDocuments'
+      },
+
+      minUserLevel: 0,
+
+      credit: {
+
+        cost: 0,
+        earn: 0,
+        minNeeded: 0
+
+      },
+
+      serviceBuilder: function(req) {
+        return {
+          ids: req.body.ids,
+          collection: req.body.collection
+        }
+      },
+
+      loaderAsync: function(services) {
+        return [
+          
+        ]
+      },
+
+      canIDo: function(services) {
+
+        return true;
+      },
+
+      whatToDo: function(services) {
+        services.multiConvertIdsToMongoIds();
+      },
+
+      successPostFlightAsync: function(services) {
+        return [
+          services.deleteIdsRecordsFromCollection()
+        ]
+      },
+
+      successResponseBuilder: function(services) {
+        return {
+          toast: undefined, //undefined,//services.getSuccessMessagesStr(),
+          data: undefined//services.serveQuery()
+        };
+      },
+
+      cantDoResponseBuilder: function(services) {
+        return {
+          toast: services.getCantDoMessagesStr(),
+          data: undefined
+        };
+      }
+
+    },
+
     approveQuestion: {
 
       name: {

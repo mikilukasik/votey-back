@@ -87,6 +87,20 @@ module.exports = function(router, app, libs) {
         res.json(resJson);
       });
     });
+
+    router.route('/multiDeleteDocuments')
+    .post(function(req, res) {    //put here auth
+      dealWithUserAction({
+        role: 'general',
+        cmd: 'dealWithUserAction',
+        req: req,
+        res: res,
+        desiredAction: 'multiDeleteDocuments'
+      }, function(err, resJson) {
+        if (err) return dealWithError(err, res);
+        res.json(resJson);
+      });
+    });
       ////////////////////////  login  ///////////////////////
 
   router.route('/login') //register
