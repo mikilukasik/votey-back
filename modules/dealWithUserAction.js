@@ -55,16 +55,12 @@ module.exports = function(libs) {
         //could not load services
 
         console.log('ERROR: Could not load services: ', err);
-        cb(null, {
-          toast: {
-            type: 'error',
-            text: 'ERROR: Could not load services: ' + err
-          },
-          error: true
-        });
+        cb(err, null);
 
-      }).then(function(success){}, function(err){
-        cb(err,null);
+      }).then(function(success){
+        console.log('dealWithUserAction success.')
+      }, function(err){
+        cb(err, null);
       });
 
   };
