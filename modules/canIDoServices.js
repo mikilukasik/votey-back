@@ -229,8 +229,8 @@ var exporter = function(libs) {
       return new Promise(function(resolve, reject) {
 
         services.hashThisPwd( services.userToRegister.pwd ).then(function(hash){
-          services.userToRegister.pwd = undefined;
-          services.userToRegister.pwd2 = undefined;
+          delete services.userToRegister.pwd;
+          delete services.userToRegister.pwd2;
           services.userToRegister.hashedPwd = hash;
 
           db.save('admins', services.userToRegister).then(function(savedUser) {
