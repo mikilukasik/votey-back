@@ -4,6 +4,7 @@ var exporter = function(libs) {
   var db = libs.db;
   var rules = libs.rules;
   var classes = libs.classes;
+  var bcrypt = libs.bcrypt;
 
   var CanIDoServices = function(params) { //class
 
@@ -22,7 +23,14 @@ var exporter = function(libs) {
       success: [],
     };
 
-
+    services.hashThisPwd = function(pwd){
+      return new Promise(function(resolve, reject){
+        bcrypt.hash(pwd, 10, function(err, hash) {
+          if(err) return reject(err);
+          return resolve(hash);
+        });
+      });
+    };
 
     services.getCantDoMessagesStr = function(joinerStr) {
       var resultStr = services.messages.cantDo.join(joinerStr ? joinerStr : ',');
@@ -220,16 +228,15 @@ var exporter = function(libs) {
     services.registerAdmin = function() {
       return new Promise(function(resolve, reject) {
 
-        var hashedPwd = services.hashThisPwd( services.userToRegister.pwd );
-        services.userToRegister.pwd = undefined;
-        services.userToRegister.pwd2 = undefined;
-        services.userToRegister.hashedPwd = hashedPwd;
+        services.hashThisPwd( services.userToRegister.pwd ).then(function(hash){
+          services.userToRegister.pwd = undefined;
+          services.userToRegister.pwd2 = undefined;
+          services.userToRegister.hashedPwd = hash;
 
-        db.save('admins', services.userToRegister).then(function(savedUser) {
-          return resolve();
-        }, function(err) {
-          return reject(err)
-        });
+          db.save('admins', services.userToRegister).then(function(savedUser) {
+            return resolve();
+          }, reject);
+        }, reject);
       });
     };
 
