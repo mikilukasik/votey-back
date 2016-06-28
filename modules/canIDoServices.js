@@ -236,9 +236,10 @@ var exporter = function(libs) {
 
     services.doSuccessPostFlightAsync = function() { //using rules
 
-      return Promise.all(rules.userActions[services.desiredAction].successPostFlightAsync(services)).then(function() {
-        return services;
-      });
+      return Promise.all(rules.userActions[services.desiredAction].successPostFlightAsync(services))
+      // .then(function() {
+      //   return services;
+      // });
 
     };
 
