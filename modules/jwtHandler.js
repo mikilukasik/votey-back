@@ -18,7 +18,6 @@ module.exports = function(libs) {
         var token = jwt.sign(createFrom, secret, {
           expiresIn: 86400 * 7   //one week in seconds
         });
-        console.log('some token generated')
         resolve(token);
 
       });

@@ -227,6 +227,10 @@ var exporter = function(libs) {
       });
     };
 
+    services.getTokenToSend = function () {
+      return services.tokenToSend;
+    };
+
     services.loadData = function() { //using rules
 
       return Promise.all(rules.userActions[services.desiredAction].loaderAsync(services)).then(function() {
