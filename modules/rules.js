@@ -34,6 +34,63 @@ var rules = {
 
   userActions: {
 
+    adminRegister: {
+
+      name: {
+        type: 'userActions',
+        action: 'adminRegister'
+      },
+
+      minUserLevel: 0,
+
+      credit: {
+
+        cost: 0,
+        earn: 0,
+        minNeeded: 0
+
+      },
+
+      serviceBuilder: function(req) {
+        return {
+          userToRegister: req.body.user
+        }
+      },
+
+      loaderAsync: function(services) {
+        return []
+      },
+
+      canIDo: function(services) {
+        return true;
+      },
+
+      whatToDo: function(services) {
+
+      },
+
+      successPostFlightAsync: function(services) {
+        return [
+          services.registerAdmin()
+        ]
+      },
+
+      successResponseBuilder: function(services) {
+        return {
+          toast: undefined, //undefined,//services.getSuccessMessagesStr(),
+          data: undefined
+        };
+      },
+
+      cantDoResponseBuilder: function(services) {
+        return {
+          toast: services.getCantDoMessagesStr(),
+          data: undefined
+        };
+      }
+
+    },
+
     dbQuery: {
 
       name: {

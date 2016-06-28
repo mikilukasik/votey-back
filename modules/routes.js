@@ -18,10 +18,15 @@ module.exports = function(router, app, libs) {
     }
     
     tokens.unpack(authToken).then(function (decoded) {
+
+      if (!decoded) return next(new Error('Could not decode authToken'));
+      if (!decoded.clientMongoId) return next(new Error('No clientMongoId in authToken'));
+
       req.clientMongoId = decoded.clientMongoId;
       next();
+
     }, function(err){
-      next(err);
+      next( new Error(err) );
     })
     
     // return next();
@@ -46,7 +51,21 @@ module.exports = function(router, app, libs) {
       })
     });
   ////////////////////////  admin  ///////////////////////
-  router.route('/dbQuery')
+    router.route('/adminRegister')
+    .post(function(req, res) {
+      dealWithUserAction({
+        role: 'general',
+        cmd: 'dealWithUserAction',
+        req: req,
+        res: res,
+        desiredAction: 'adminRegister'
+      }, function(err, resJson) {
+        if (err) return dealWithError(err, res);
+        res.json(resJson);
+      });
+    });
+
+    router.route('/dbQuery')
     .post(function(req, res) {    //put here auth
       dealWithUserAction({
         role: 'general',
