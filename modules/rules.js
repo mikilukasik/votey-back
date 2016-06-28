@@ -53,7 +53,7 @@ var rules = {
 
       serviceBuilder: function(req) {
         return {
-          userToRegister: req.body.user
+          userToRegister: req.body
         }
       },
 
