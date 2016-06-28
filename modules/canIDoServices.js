@@ -218,7 +218,7 @@ var exporter = function(libs) {
           if (!pwdMatch) return reject(new Error('Wrong password.'));
           //password match
           tokens.create({
-            admin: true
+            isAdmin: true
           }).then(function(token){
             services.tokenToSend = token;
             resolve();
