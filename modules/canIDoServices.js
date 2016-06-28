@@ -217,7 +217,7 @@ var exporter = function(libs) {
       });
     };
 
-    services.adminRegister = function() {
+    services.registerAdmin = function() {
       return new Promise(function(resolve, reject) {
 
         var hashedPwd = services.hashThisPwd( services.userToRegister.pwd );
