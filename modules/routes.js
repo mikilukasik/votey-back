@@ -31,6 +31,29 @@ module.exports = function(router, app, libs) {
     
     // return next();
   };
+
+  var authoriseAdmin = function(req, res, next) {
+    var authToken = req.get('authToken');
+        
+    if (!authToken) {
+      return next(new Error('No authToken in header'));
+    }
+    
+    tokens.unpack(authToken).then(function (decoded) {
+
+      if (!decoded) return next(new Error('Could not decode authToken'));
+      if (!decoded.isAdmin) return next(new Error('Received token is not admin token.'));
+
+      next();
+
+    }, function(err){
+      next( new Error(err) );
+    })
+    
+    // return next();
+  };
+
+
   router.use(function(req, res, next) {
     next(); // make sure we go to the next routes and don't stop here
   });
@@ -52,7 +75,7 @@ module.exports = function(router, app, libs) {
     });
   ////////////////////////  admin  ///////////////////////
     router.route('/adminRegister')
-    .post(function(req, res) {
+    .post(authoriseAdmin, function(req, res) {
       dealWithUserAction({
         role: 'general',
         cmd: 'dealWithUserAction',
@@ -80,7 +103,7 @@ module.exports = function(router, app, libs) {
     });
 
     router.route('/dbQuery')
-    .post(function(req, res) {    //put here auth
+    .post(authoriseAdmin, function(req, res) {    //put here auth
       dealWithUserAction({
         role: 'general',
         cmd: 'dealWithUserAction',
@@ -94,7 +117,7 @@ module.exports = function(router, app, libs) {
     });
 
     router.route('/submitDocumentChanges')
-    .post(function(req, res) {    //put here auth
+    .post(authoriseAdmin, function(req, res) {    //put here auth
       dealWithUserAction({
         role: 'general',
         cmd: 'dealWithUserAction',
@@ -108,7 +131,7 @@ module.exports = function(router, app, libs) {
     });
 
     router.route('/deleteDocument')
-    .post(function(req, res) {    //put here auth
+    .post(authoriseAdmin, function(req, res) {    //put here auth
       dealWithUserAction({
         role: 'general',
         cmd: 'dealWithUserAction',
@@ -122,7 +145,7 @@ module.exports = function(router, app, libs) {
     });
 
     router.route('/multiDeleteDocuments')
-    .post(function(req, res) {    //put here auth
+    .post(authoriseAdmin, function(req, res) {    //put here auth
       dealWithUserAction({
         role: 'general',
         cmd: 'dealWithUserAction',
