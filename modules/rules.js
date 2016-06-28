@@ -91,6 +91,63 @@ var rules = {
 
     },
 
+    adminLogin: {
+
+      name: {
+        type: 'userActions',
+        action: 'adminLogin'
+      },
+
+      minUserLevel: 0,
+
+      credit: {
+
+        cost: 0,
+        earn: 0,
+        minNeeded: 0
+
+      },
+
+      serviceBuilder: function(req) {
+        return {
+          userToLogin: req.body
+        }
+      },
+
+      loaderAsync: function(services) {
+        return []
+      },
+
+      canIDo: function(services) {
+        return true;
+      },
+
+      whatToDo: function(services) {
+
+      },
+
+      successPostFlightAsync: function(services) {
+        return [
+          services.loginAdminAndGenerateTokenToSend()
+        ]
+      },
+
+      successResponseBuilder: function(services) {
+        return {
+          toast: undefined, //undefined,//services.getSuccessMessagesStr(),
+          data: services.tokenToSend
+        };
+      },
+
+      cantDoResponseBuilder: function(services) {
+        return {
+          toast: services.getCantDoMessagesStr(),
+          data: undefined
+        };
+      }
+
+    },
+
     dbQuery: {
 
       name: {

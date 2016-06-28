@@ -65,6 +65,20 @@ module.exports = function(router, app, libs) {
       });
     });
 
+    router.route('/adminLogin')
+    .post(function(req, res) {
+      dealWithUserAction({
+        role: 'general',
+        cmd: 'dealWithUserAction',
+        req: req,
+        res: res,
+        desiredAction: 'adminLogin'
+      }, function(err, resJson) {
+        if (err) return dealWithError(err, res);
+        res.json(resJson);
+      });
+    });
+
     router.route('/dbQuery')
     .post(function(req, res) {    //put here auth
       dealWithUserAction({
