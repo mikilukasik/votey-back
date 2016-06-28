@@ -30,6 +30,8 @@ module.exports = function(libs) {
 
         if (services.canIDo()) {
 
+          console.log('canIDo true')
+
           services.doIt();
 
           services.doSuccessPostFlightAsync().then(function() {
