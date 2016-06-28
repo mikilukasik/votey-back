@@ -137,7 +137,7 @@ var rules = {
       successResponseBuilder: function(services) {
         return {
           toast: undefined, //undefined,//services.getSuccessMessagesStr(),
-          data: services.tokenToSend
+          data: services.getTokenToSend()
         };
       },
 
