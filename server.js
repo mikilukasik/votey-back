@@ -46,15 +46,20 @@ var seneca = require('seneca')();
 
 var classes = require('./modules/classes.js');
 
+var jwt = require('jsonwebtoken')
+var tokens = require('./modules/jwtHandler.js')({jwt: jwt});
+
 var CanIDoServices = require('./modules/canIDoServices.js')({
 	_: _,
 	db: db,
 	rules: rules,
 	bcrypt: bcrypt,
-	classes: classes
+	classes: classes,
+	//jwt: jwt,
+	tokens: tokens
 })
 
-var jwt = require('jsonwebtoken')
+
 
 var libs = {
 	db: db,
@@ -69,7 +74,7 @@ var libs = {
 seneca.use('./modules/sen.loginActions.js', libs);
 //seneca.use('./modules/sen.dealWithUserAction.js', libs);
 libs.jwt = jwt;
-var tokens = require('./modules/jwtHandler.js')(libs);
+
 
 
 libs.dealWithUserAction = require('./modules/dealWithUserAction.js')(libs);

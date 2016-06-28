@@ -110,12 +110,14 @@ var rules = {
 
       serviceBuilder: function(req) {
         return {
-          userToLogin: req.body
+          adminToLogin: req.body
         }
       },
 
       loaderAsync: function(services) {
-        return []
+        return [
+          services.loadAdminByName()
+        ]
       },
 
       canIDo: function(services) {
@@ -128,7 +130,7 @@ var rules = {
 
       successPostFlightAsync: function(services) {
         return [
-          services.loginAdminAndGenerateTokenToSend()
+          services.checkAdminPasswordAndGenerateTokenToSend()
         ]
       },
 

@@ -5,6 +5,7 @@ var exporter = function(libs) {
   var rules = libs.rules;
   var classes = libs.classes;
   var bcrypt = libs.bcrypt;
+  var tokens = libs.tokens;
 
   var CanIDoServices = function(params) { //class
 
@@ -197,6 +198,34 @@ var exporter = function(libs) {
       });
     };
 
+    services.loadAdminByName = function() {
+      return new Promise(function(resolve, reject) {
+        db.findOne('admins', {
+          name: services.adminToLogin.name
+        }).then(function(adminDoc) {
+          services.adminDoc = adminDoc;
+          return resolve(adminDoc);
+        }, function(err) {
+          return reject(err);
+        });
+      });
+    };
+
+    services.checkAdminPasswordAndGenerateTokenToSend = function(){
+      return new Promise(function(resolve, reject){
+        bcrypt.compare(services.adminToLogin.pwd, services.adminDoc.hashedPwd, function(err, pwdMatch) {
+          if (err) return reject(err);
+          if (!pwdMatch) return reject('Wrong password.');
+          //password match
+          tokens.create({
+            admin: true
+          }).then(function(token){
+            services.tokenToSend = token;
+          }, reject)
+        });
+      });
+    };
+
     services.loadData = function() { //using rules
 
       return Promise.all(rules.userActions[services.desiredAction].loaderAsync(services)).then(function() {
@@ -256,8 +285,8 @@ var exporter = function(libs) {
 
       var savingPromises = [];
 
-      if (services.whatToSave.indexOf('client') >= 0) savingPromises.push(services.saveClient())
-      if (services.whatToSave.indexOf('question') >= 0) savingPromises.push(services.saveQuestion())
+      if (services.whatToSave.indexOf('client') >= 0) savingPromises.push(services.saveClient());
+      if (services.whatToSave.indexOf('question') >= 0) savingPromises.push(services.saveQuestion());
 
       return Promise.all(savingPromises);
     };
