@@ -50,6 +50,7 @@ var CanIDoServices = require('./modules/canIDoServices.js')({
 	_: _,
 	db: db,
 	rules: rules,
+	bcrypt: bcrypt,
 	classes: classes
 })
 
