@@ -34,7 +34,11 @@ module.exports = function(libs) {
 
           services.doSuccessPostFlightAsync().then(function() {
 
-            cb(null, services.buildSuccessResponse());
+            var response = services.buildSuccessResponse();
+
+            console.log('seccess response built: ', response);
+
+            cb(null, response);
 
           }, 
 
@@ -47,7 +51,8 @@ module.exports = function(libs) {
           });
         } else {
           //could not do action
-          cb(null, services.buildCantDoResponse());
+          var response = services.buildCantDoResponse();
+          cb(null, response);
 
         }
 
