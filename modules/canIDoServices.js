@@ -22,6 +22,8 @@ var exporter = function(libs) {
       success: [],
     };
 
+
+
     services.getCantDoMessagesStr = function(joinerStr) {
       var resultStr = services.messages.cantDo.join(joinerStr ? joinerStr : ',');
       services.messages.cantDo = [];
@@ -209,6 +211,22 @@ var exporter = function(libs) {
 
           services.whatToSave.splice(services.whatToSave.indexOf('question'), 1);
           return resolve(savedQuestionDoc);
+        }, function(err) {
+          return reject(err)
+        });
+      });
+    };
+
+    services.adminRegister = function() {
+      return new Promise(function(resolve, reject) {
+
+        var hashedPwd = services.hashThisPwd( services.userToRegister.pwd );
+        services.userToRegister.pwd = undefined;
+        services.userToRegister.pwd2 = undefined;
+        services.userToRegister.hashedPwd = hashedPwd;
+
+        db.save('admins', services.userToRegister).then(function(savedUser) {
+          return resolve();
         }, function(err) {
           return reject(err)
         });
