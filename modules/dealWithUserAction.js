@@ -33,7 +33,7 @@ module.exports = function(libs) {
           services.doIt();
           console.log('doIt done')
 
-          services.doSuccessPostFlightAsync().then(function() {
+          return services.doSuccessPostFlightAsync().then(function() {
 
             console.log('doSuccessPostFlightAsync done')
 
@@ -42,7 +42,7 @@ module.exports = function(libs) {
 
             console.log('success response built: ', response);
 
-            cb(null, response);
+            return cb(null, response);
 
           }, 
 
@@ -51,12 +51,12 @@ module.exports = function(libs) {
             //error in logic?
 
             console.log('ERROR: some error in logic(?), canIdo true, but error in doAndSaveData: ', saveErr);
-            cb(saveErr, null);
+            return cb(saveErr, null);
           });
         } else {
           //could not do action
           var response = services.buildCantDoResponse();
-          cb(null, response);
+          return cb(null, response);
 
         }
 
@@ -64,11 +64,12 @@ module.exports = function(libs) {
         //could not load services
 
         console.log('ERROR: Could not load services: ', err);
-        cb(err, null);
+        return cb(err, null);
 
       }).then(function(success){
         console.log('dealWithUserAction success.')
       }, function(err){
+        console.log('dealWithUserAction error.')
         cb(err, null);
       });
 
