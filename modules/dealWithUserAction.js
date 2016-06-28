@@ -43,13 +43,7 @@ module.exports = function(libs) {
             //error in logic?
 
             console.log('ERROR: some error in logic(?), canIdo true, but error in doAndSaveData: ', saveErr);
-            cb(null, {
-              toast: {
-                type: 'error',
-                text: 'ERROR: some error in logic(?), canIdo true, but error in doAndSaveData: ' + saveErr
-              },
-              error: true
-            });
+            cb(saveErr, null);
           });
         } else {
           //could not do action
