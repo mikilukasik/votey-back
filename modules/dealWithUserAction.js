@@ -29,14 +29,18 @@ module.exports = function(libs) {
       .then(function(services) {
 
         if (services.canIDo()) {
-
+          console.log('canIDo done')
           services.doIt();
+          console.log('doIt done')
 
           services.doSuccessPostFlightAsync().then(function() {
 
+            console.log('doSuccessPostFlightAsync done')
+
+
             var response = services.buildSuccessResponse();
 
-            console.log('seccess response built: ', response);
+            console.log('success response built: ', response);
 
             cb(null, response);
 
