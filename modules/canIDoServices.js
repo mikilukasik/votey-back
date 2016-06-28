@@ -221,6 +221,7 @@ var exporter = function(libs) {
             admin: true
           }).then(function(token){
             services.tokenToSend = token;
+            resolve();
           }, reject)
         });
       });
