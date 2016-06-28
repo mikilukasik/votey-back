@@ -215,7 +215,7 @@ var exporter = function(libs) {
       return new Promise(function(resolve, reject){
         bcrypt.compare(services.adminToLogin.pwd, services.adminDoc.hashedPwd, function(err, pwdMatch) {
           if (err) return reject(err);
-          if (!pwdMatch) return reject('Wrong password.');
+          if (!pwdMatch) return reject(new Error('Wrong password.'));
           //password match
           tokens.create({
             admin: true
