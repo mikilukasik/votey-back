@@ -75,7 +75,7 @@ module.exports = function(router, app, libs) {
     });
   ////////////////////////  admin  ///////////////////////
     router.route('/adminRegister')
-    .post(authoriseAdmin, function(req, res) {
+    .post( function(req, res) {
       dealWithUserAction({
         role: 'general',
         cmd: 'dealWithUserAction',
